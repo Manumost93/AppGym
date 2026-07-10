@@ -41,6 +41,8 @@ services:
       JWT_SECRET: ${JWT_SECRET:-dev-only-jwt-secret-please-change-in-production-1234567890}
       REDIS_HOST: redis
       REDIS_PORT: 6379
+    ports:
+      - "8081:8081" # solo en dev, para poder abrir Swagger UI directamente
     depends_on:
       postgres:
         condition: service_healthy
@@ -60,6 +62,8 @@ services:
       DB_NAME: business_db
       DB_USER: business_user
       DB_PASSWORD: ${BUSINESS_DB_PASSWORD:-business_dev}
+    ports:
+      - "8082:8082" # solo en dev, para poder abrir Swagger UI directamente
     depends_on:
       postgres:
         condition: service_healthy
@@ -77,6 +81,8 @@ services:
       DB_NAME: booking_db
       DB_USER: booking_user
       DB_PASSWORD: ${BOOKING_DB_PASSWORD:-booking_dev}
+    ports:
+      - "8083:8083" # solo en dev, para poder abrir Swagger UI directamente
     depends_on:
       postgres:
         condition: service_healthy
@@ -95,6 +101,8 @@ services:
       CLAUDE_MODEL_INSIGHTS: ${CLAUDE_MODEL_INSIGHTS:-claude-sonnet-5}
       BUSINESS_SERVICE_URL: http://business-service:8082
       BOOKING_SERVICE_URL: http://booking-service:8083
+    ports:
+      - "8084:8084" # solo en dev, para poder abrir Swagger UI directamente
     depends_on:
       - business-service
       - booking-service
