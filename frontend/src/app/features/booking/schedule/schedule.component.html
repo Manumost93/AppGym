@@ -9,6 +9,20 @@
       <div class="mt-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{{ errorMessage() }}</div>
     }
 
+    @if (recommendation(); as rec) {
+      <div class="mt-8 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-slate-900 p-6 ring-1 ring-emerald-800/50">
+        <p class="text-xs font-medium uppercase tracking-wide text-emerald-400">Recomendado para ti</p>
+        <p class="mt-2 text-white">{{ rec.headline }}</p>
+        @if (rec.suggestions.length > 0) {
+          <ul class="mt-3 space-y-1 text-sm text-slate-300">
+            @for (suggestion of rec.suggestions; track suggestion) {
+              <li>• {{ suggestion }}</li>
+            }
+          </ul>
+        }
+      </div>
+    }
+
     <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
       <h2 class="text-lg font-medium text-white">Próximas franjas horarias</h2>
       @if (loading()) {

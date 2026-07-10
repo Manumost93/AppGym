@@ -5,6 +5,8 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { BusinessService } from '../../../core/business/business.service';
 import { Business, MembershipPlan } from '../../../core/business/business.models';
+import { AiService } from '../../../core/ai/ai.service';
+import { InsightsResponse } from '../../../core/ai/ai.models';
 
 @Component({
   selector: 'app-my-business',
@@ -16,6 +18,7 @@ export class MyBusinessComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly businessService = inject(BusinessService);
   private readonly authService = inject(AuthService);
+  private readonly aiService = inject(AiService);
 
   readonly business = signal<Business | null>(null);
   readonly plans = signal<MembershipPlan[]>([]);
@@ -23,6 +26,9 @@ export class MyBusinessComponent implements OnInit {
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly editingPlanId = signal<string | null>(null);
+
+  readonly insights = signal<InsightsResponse | null>(null);
+  readonly loadingInsights = signal(false);
 
   readonly businessId = this.authService.currentUser()?.businessId ?? null;
 
@@ -37,6 +43,18 @@ export class MyBusinessComponent implements OnInit {
   ngOnInit(): void {
     this.businessService.getMyBusiness().subscribe((business) => this.business.set(business));
     this.reloadPlans();
+    this.loadInsights();
+  }
+
+  loadInsights(): void {
+    this.loadingInsights.set(true);
+    this.aiService.insights().subscribe({
+      next: (insights) => {
+        this.insights.set(insights);
+        this.loadingInsights.set(false);
+      },
+      error: () => this.loadingInsights.set(false),
+    });
   }
 
   reloadPlans(): void {

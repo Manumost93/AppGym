@@ -3,6 +3,8 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { BookingService } from '../../../core/booking/booking.service';
 import { Booking, ScheduleSlot } from '../../../core/booking/booking.models';
+import { AiService } from '../../../core/ai/ai.service';
+import { RecommendationResponse } from '../../../core/ai/ai.models';
 
 @Component({
   selector: 'app-schedule',
@@ -12,6 +14,7 @@ import { Booking, ScheduleSlot } from '../../../core/booking/booking.models';
 })
 export class ScheduleComponent implements OnInit {
   private readonly bookingService = inject(BookingService);
+  private readonly aiService = inject(AiService);
 
   readonly slots = signal<ScheduleSlot[]>([]);
   readonly myBookings = signal<Booking[]>([]);
@@ -19,8 +22,12 @@ export class ScheduleComponent implements OnInit {
   readonly errorMessage = signal<string | null>(null);
   readonly bookingSlotId = signal<string | null>(null);
 
+  readonly recommendation = signal<RecommendationResponse | null>(null);
+  readonly loadingRecommendation = signal(true);
+
   ngOnInit(): void {
     this.reload();
+    this.loadRecommendation();
   }
 
   reload(): void {
@@ -33,6 +40,19 @@ export class ScheduleComponent implements OnInit {
       error: () => this.loading.set(false),
     });
     this.bookingService.listMyBookings().subscribe((bookings) => this.myBookings.set(bookings));
+  }
+
+  loadRecommendation(): void {
+    this.loadingRecommendation.set(true);
+    this.aiService.recommend().subscribe({
+      next: (recommendation) => {
+        this.recommendation.set(recommendation);
+        this.loadingRecommendation.set(false);
+      },
+      // El asistente de IA es un extra: si falla (p. ej. sin clave configurada),
+      // el resto de la pagina de reservas debe seguir funcionando con normalidad.
+      error: () => this.loadingRecommendation.set(false),
+    });
   }
 
   activeBookingForSlot(slotId: string): Booking | undefined {

@@ -12,6 +12,10 @@ anthropic:
     recommend: ${CLAUDE_MODEL_RECOMMEND:claude-sonnet-5}
     insights: ${CLAUDE_MODEL_INSIGHTS:claude-sonnet-5}
 
+internal-services:
+  business-service-url: ${BUSINESS_SERVICE_URL:http://business-service:8082}
+  booking-service-url: ${BOOKING_SERVICE_URL:http://booking-service:8083}
+
 management:
   endpoints:
     web:

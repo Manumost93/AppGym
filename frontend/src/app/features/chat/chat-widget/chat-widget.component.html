@@ -1,0 +1,55 @@
+<div class="fixed bottom-5 right-5 z-50">
+  @if (open()) {
+    <div class="mb-3 flex h-[28rem] w-80 flex-col rounded-2xl bg-slate-900 shadow-2xl ring-1 ring-slate-700">
+      <div class="flex items-center justify-between rounded-t-2xl bg-slate-800 px-4 py-3">
+        <p class="text-sm font-medium text-white">Asistente AppGym</p>
+        <button (click)="toggle()" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <div class="flex-1 space-y-3 overflow-y-auto px-4 py-3">
+        @for (message of messages(); track $index) {
+          <div [class.text-right]="message.role === 'user'">
+            <span
+              class="inline-block max-w-[85%] rounded-xl px-3 py-2 text-sm"
+              [class.bg-emerald-500]="message.role === 'user'"
+              [class.text-slate-950]="message.role === 'user'"
+              [class.bg-slate-800]="message.role === 'assistant'"
+              [class.text-slate-100]="message.role === 'assistant'"
+            >
+              {{ message.content }}
+            </span>
+          </div>
+        }
+        @if (sending()) {
+          <p class="text-xs text-slate-500">Escribiendo…</p>
+        }
+        <div #scrollAnchor></div>
+      </div>
+
+      <form class="flex gap-2 border-t border-slate-800 p-3" (ngSubmit)="send()">
+        <input
+          [(ngModel)]="draft"
+          name="draft"
+          type="text"
+          placeholder="Escribe un mensaje…"
+          class="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+        />
+        <button
+          type="submit"
+          [disabled]="sending()"
+          class="rounded-lg bg-emerald-500 px-3 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-400 disabled:opacity-50"
+        >
+          Enviar
+        </button>
+      </form>
+    </div>
+  }
+
+  <button
+    (click)="toggle()"
+    class="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-2xl text-slate-950 shadow-xl hover:bg-emerald-400"
+    aria-label="Abrir chat"
+  >
+    {{ open() ? '×' : '💬' }}
+  </button>
+</div>
