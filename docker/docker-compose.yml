@@ -48,6 +48,23 @@ services:
         condition: service_started
     networks: [appgym-network]
 
+  business-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE: business-service
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: business_db
+      DB_USER: business_user
+      DB_PASSWORD: ${BUSINESS_DB_PASSWORD:-business_dev}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [appgym-network]
+
   api-gateway:
     build:
       context: ../backend
@@ -63,6 +80,7 @@ services:
       - "8080:8080"
     depends_on:
       - auth-service
+      - business-service
     networks: [appgym-network]
 
   frontend:

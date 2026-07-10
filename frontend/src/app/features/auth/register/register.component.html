@@ -47,17 +47,20 @@
         </select>
       </div>
 
+      @if (lockedFields()) {
+        <p class="text-xs text-slate-500">
+          Estás dando de alta un miembro del staff de tu negocio: el rol y el negocio ya vienen fijados.
+        </p>
+      }
+
       @if (requiresBusinessId()) {
         <div>
-          <label class="block text-sm font-medium text-slate-300" for="businessId">
-            Business ID
-            <span class="font-normal text-slate-500">(disponible desde la Fase 2)</span>
-          </label>
+          <label class="block text-sm font-medium text-slate-300" for="businessId">Business ID</label>
           <input
             id="businessId"
             type="text"
             formControlName="businessId"
-            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500 disabled:opacity-60"
             placeholder="UUID del negocio"
           />
         </div>

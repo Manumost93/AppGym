@@ -1,0 +1,98 @@
+<div class="min-h-screen bg-slate-950 px-4 py-10">
+  <div class="mx-auto max-w-3xl">
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-semibold text-white">Negocios</h1>
+      <a routerLink="/dashboard" class="text-sm text-slate-400 hover:text-white">← Volver</a>
+    </div>
+
+    <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
+      <h2 class="text-lg font-medium text-white">Crear negocio</h2>
+      <form class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2" [formGroup]="form" (ngSubmit)="submit()">
+        <div>
+          <label class="block text-sm font-medium text-slate-300">Nombre</label>
+          <input
+            formControlName="name"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300">Tipo</label>
+          <select
+            formControlName="type"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          >
+            @for (type of types; track type) {
+              <option [value]="type">{{ type }}</option>
+            }
+          </select>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-medium text-slate-300">Descripción</label>
+          <input
+            formControlName="description"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300">Email de contacto</label>
+          <input
+            formControlName="contactEmail"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300">Teléfono</label>
+          <input
+            formControlName="contactPhone"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-medium text-slate-300">Dirección</label>
+          <input
+            formControlName="address"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
+
+        @if (errorMessage()) {
+          <p class="sm:col-span-2 text-sm text-red-400">{{ errorMessage() }}</p>
+        }
+
+        <div class="sm:col-span-2">
+          <button
+            type="submit"
+            [disabled]="creating()"
+            class="rounded-lg bg-emerald-500 px-4 py-2 font-medium text-slate-950 transition hover:bg-emerald-400 disabled:opacity-50"
+          >
+            {{ creating() ? 'Creando…' : 'Crear negocio' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
+      <h2 class="text-lg font-medium text-white">Negocios existentes</h2>
+      @if (loading()) {
+        <p class="mt-4 text-slate-400">Cargando…</p>
+      } @else if (businesses().length === 0) {
+        <p class="mt-4 text-slate-400">Todavía no hay negocios creados.</p>
+      } @else {
+        <div class="mt-4 space-y-3">
+          @for (business of businesses(); track business.id) {
+            <div class="rounded-lg border border-slate-800 p-4">
+              <div class="flex items-center justify-between">
+                <p class="font-medium text-white">{{ business.name }}</p>
+                <span class="rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-400">{{ business.type }}</span>
+              </div>
+              <p class="mt-1 text-xs text-slate-500">
+                ID (para dar de alta al BUSINESS_ADMIN):
+                <code class="text-emerald-400">{{ business.id }}</code>
+              </p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

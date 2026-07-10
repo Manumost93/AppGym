@@ -1,0 +1,119 @@
+<div class="min-h-screen bg-slate-950 px-4 py-10">
+  <div class="mx-auto max-w-3xl">
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-semibold text-white">Mi negocio</h1>
+      <a routerLink="/dashboard" class="text-sm text-slate-400 hover:text-white">← Volver</a>
+    </div>
+
+    @if (business(); as b) {
+      <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-medium text-white">{{ b.name }}</h2>
+          <span class="rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-400">{{ b.type }}</span>
+        </div>
+        @if (b.description) {
+          <p class="mt-2 text-sm text-slate-400">{{ b.description }}</p>
+        }
+        <a
+          [routerLink]="['/register']"
+          [queryParams]="{ role: 'STAFF', businessId: businessId }"
+          class="mt-4 inline-block rounded-lg border border-emerald-600 px-3 py-1.5 text-sm text-emerald-400 hover:bg-emerald-500/10"
+        >
+          + Dar de alta un miembro del staff
+        </a>
+      </div>
+    }
+
+    <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
+      <h2 class="text-lg font-medium text-white">
+        {{ editingPlanId() ? 'Editar plan' : 'Nuevo plan de membresía' }}
+      </h2>
+      <form class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-medium text-slate-300">Nombre</label>
+          <input
+            formControlName="name"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-medium text-slate-300">Descripción</label>
+          <input
+            formControlName="description"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300">Precio (céntimos)</label>
+          <input
+            type="number"
+            formControlName="priceCents"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300">Moneda</label>
+          <input
+            formControlName="currency"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300">Duración (días)</label>
+          <input
+            type="number"
+            formControlName="durationDays"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
+
+        @if (errorMessage()) {
+          <p class="sm:col-span-2 text-sm text-red-400">{{ errorMessage() }}</p>
+        }
+
+        <div class="flex gap-2 sm:col-span-2">
+          <button
+            type="submit"
+            [disabled]="saving()"
+            class="rounded-lg bg-emerald-500 px-4 py-2 font-medium text-slate-950 transition hover:bg-emerald-400 disabled:opacity-50"
+          >
+            {{ saving() ? 'Guardando…' : editingPlanId() ? 'Guardar cambios' : 'Crear plan' }}
+          </button>
+          @if (editingPlanId()) {
+            <button
+              type="button"
+              (click)="cancelEdit()"
+              class="rounded-lg border border-slate-700 px-4 py-2 text-slate-300 hover:bg-slate-800"
+            >
+              Cancelar
+            </button>
+          }
+        </div>
+      </form>
+    </div>
+
+    <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
+      <h2 class="text-lg font-medium text-white">Planes de membresía</h2>
+      @if (loading()) {
+        <p class="mt-4 text-slate-400">Cargando…</p>
+      } @else if (plans().length === 0) {
+        <p class="mt-4 text-slate-400">Todavía no hay planes creados.</p>
+      } @else {
+        <div class="mt-4 space-y-3">
+          @for (plan of plans(); track plan.id) {
+            <div class="flex items-center justify-between rounded-lg border border-slate-800 p-4">
+              <div>
+                <p class="font-medium text-white">{{ plan.name }}</p>
+                <p class="text-sm text-slate-400">{{ priceLabel(plan) }} · {{ plan.durationDays }} días</p>
+              </div>
+              <div class="flex gap-2">
+                <button (click)="edit(plan)" class="text-sm text-emerald-400 hover:text-emerald-300">Editar</button>
+                <button (click)="deletePlan(plan)" class="text-sm text-red-400 hover:text-red-300">Eliminar</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -27,6 +27,22 @@
           <dt class="text-slate-500">Business ID</dt>
           <dd class="text-white">{{ user()!.businessId ?? '—' }}</dd>
         </dl>
+
+        @if (user()!.role === 'SUPER_ADMIN') {
+          <a
+            routerLink="/businesses"
+            class="mt-6 inline-block rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-400"
+          >
+            Gestionar negocios
+          </a>
+        } @else if (user()!.role === 'BUSINESS_ADMIN') {
+          <a
+            routerLink="/my-business"
+            class="mt-6 inline-block rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-400"
+          >
+            Mi negocio
+          </a>
+        }
       }
     </div>
   </div>

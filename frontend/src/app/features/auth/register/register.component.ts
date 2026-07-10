@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Role } from '../../../core/auth/auth.models';
 
@@ -15,10 +15,15 @@ export class RegisterComponent {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly roles: Role[] = ['SUPER_ADMIN', 'BUSINESS_ADMIN', 'STAFF', 'MEMBER'];
   readonly errorMessage = signal<string | null>(null);
   readonly loading = signal(false);
+
+  // Cuando llega desde "Mi negocio" -> "Dar de alta staff", el rol y el negocio
+  // vienen fijados por query params y no deben poder cambiarse desde el formulario.
+  readonly lockedFields = signal(false);
 
   readonly form = this.fb.group({
     fullName: ['', [Validators.required]],
@@ -28,8 +33,21 @@ export class RegisterComponent {
     businessId: [''],
   });
 
+  constructor() {
+    const queryParams = this.route.snapshot.queryParamMap;
+    const presetRole = queryParams.get('role') as Role | null;
+    const presetBusinessId = queryParams.get('businessId');
+
+    if (presetRole && presetBusinessId) {
+      this.lockedFields.set(true);
+      this.form.patchValue({ role: presetRole, businessId: presetBusinessId });
+      this.form.get('role')?.disable();
+      this.form.get('businessId')?.disable();
+    }
+  }
+
   requiresBusinessId(): boolean {
-    return this.form.value.role !== 'SUPER_ADMIN';
+    return this.form.getRawValue().role !== 'SUPER_ADMIN';
   }
 
   submit(): void {
@@ -41,13 +59,15 @@ export class RegisterComponent {
     this.loading.set(true);
     this.errorMessage.set(null);
 
+    const value = this.form.getRawValue();
+
     this.authService
       .register({
-        fullName: this.form.value.fullName!,
-        email: this.form.value.email!,
-        password: this.form.value.password!,
-        role: this.form.value.role!,
-        businessId: this.form.value.businessId || null,
+        fullName: value.fullName!,
+        email: value.email!,
+        password: value.password!,
+        role: value.role!,
+        businessId: value.businessId || null,
       })
       .subscribe({
         next: () => {
