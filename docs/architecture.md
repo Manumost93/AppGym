@@ -34,10 +34,11 @@ Plataforma SaaS multi-negocio para gestionar gimnasios, boxes de crossfit y club
 - **Sin Eureka**: con 5 servicios fijos, el DNS de docker-compose ya resuelve nombres de servicio. Anadir service discovery no aporta aprendizaje adicional a esta escala.
 - **Sin message broker**: las llamadas REST sincronas son suficientes para 5 servicios. Un evento `booking.created` a un futuro `notification-service` queda documentado como mejora futura, no como parte del MVP.
 - **Redis**: rate limiting de `/api/ai/**` en el gateway, blacklist de refresh tokens en `auth-service`, cache opcional de `/insights`.
-- **Postgres**: un unico proceso con una base de datos y un usuario propio por servicio (database-per-service logico). En produccion, gestionado por Supabase.
+- **Postgres**: un unico proceso con una base de datos y un usuario propio por servicio (database-per-service logico). En produccion vive dentro del propio VPS (mismo docker-compose.prod.yml) para simplificar el primer despliegue; migrar a un Postgres gestionado (Supabase u otro) mas adelante es solo un cambio de variables de entorno (`DB_HOST`/`DB_USER`/`DB_PASSWORD`), sin tocar codigo.
 - **JWT HS256**: secreto compartido entre `api-gateway` y `auth-service`. RS256 queda documentado como mejora futura (rotacion de claves sin compartir secreto).
 - **Testing**: JUnit5+Mockito en todos los servicios; Testcontainers solo en `booking-service` (el mas representativo por reservas/capacidad/transacciones).
-- **Despliegue**: backend en VPS barato (Hetzner) con docker-compose + Traefik (Let's Encrypt automatico, solo `api-gateway` es publico). Frontend Angular en Vercel. Se prefirio a un PaaS tipo Render por coste y porque demuestra mejor el dominio de Docker/orquestacion.
+- **CI/CD**: GitHub Actions compila y testea backend+frontend en cada push; en `main` ademas construye y publica las 5 imagenes del backend en GHCR (`ghcr.io/<usuario>/appgym-*`), listas para desplegar sin compilar nada en el servidor de produccion.
+- **Despliegue**: backend en VPS barato (Hetzner) con `docker-compose.prod.yml` + Traefik (Let's Encrypt automatico, solo `api-gateway` es publico; ver `docs/deployment.md`). Sin dominio propio, se usa `nip.io` como DNS gratuito apuntando a la IP del VPS, con HTTPS real igualmente. Frontend Angular en Vercel. Se prefirio a un PaaS tipo Render por coste y porque demuestra mejor el dominio de Docker/orquestacion.
 
 ## IA (`ai-service`)
 

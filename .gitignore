@@ -11,6 +11,7 @@ frontend/.angular/
 # Entornos y secretos
 .env
 docker/.env
+docker/.env.prod
 *.env.local
 
 # IDE / OS

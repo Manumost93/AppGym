@@ -1,0 +1,151 @@
+# Stack de produccion para el VPS. Diferencias clave frente a docker-compose.yml:
+# - Usa imagenes ya construidas por CI en GHCR (docker compose pull) en vez de
+#   compilar Java/Node en la propia maquina de produccion.
+# - Postgres y Redis no publican puertos al host (solo accesibles en la red
+#   interna de docker-compose).
+# - Traefik es el unico servicio publico: enruta HTTPS (Let's Encrypt
+#   automatico) unicamente hacia api-gateway.
+#
+# Uso: desde el VPS, con un archivo .env.prod junto a este fichero (ver
+# docker/.env.prod.example) y las imagenes ya publicadas por CI:
+#   docker compose --env-file .env.prod -f docker-compose.prod.yml pull
+#   docker compose --env-file .env.prod -f docker-compose.prod.yml up -d
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: appgym
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+      AUTH_DB_PASSWORD: ${AUTH_DB_PASSWORD}
+      BUSINESS_DB_PASSWORD: ${BUSINESS_DB_PASSWORD}
+      BOOKING_DB_PASSWORD: ${BOOKING_DB_PASSWORD}
+    volumes:
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U appgym -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks: [appgym-network]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks: [appgym-network]
+
+  auth-service:
+    image: ghcr.io/${IMAGE_NAMESPACE:-manumost93}/appgym-auth-service:${IMAGE_TAG:-latest}
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: auth_db
+      DB_USER: auth_user
+      DB_PASSWORD: ${AUTH_DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+    networks: [appgym-network]
+
+  business-service:
+    image: ghcr.io/${IMAGE_NAMESPACE:-manumost93}/appgym-business-service:${IMAGE_TAG:-latest}
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: business_db
+      DB_USER: business_user
+      DB_PASSWORD: ${BUSINESS_DB_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks: [appgym-network]
+
+  booking-service:
+    image: ghcr.io/${IMAGE_NAMESPACE:-manumost93}/appgym-booking-service:${IMAGE_TAG:-latest}
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: booking_db
+      DB_USER: booking_user
+      DB_PASSWORD: ${BOOKING_DB_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks: [appgym-network]
+
+  ai-service:
+    image: ghcr.io/${IMAGE_NAMESPACE:-manumost93}/appgym-ai-service:${IMAGE_TAG:-latest}
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      CLAUDE_MODEL_CHAT: ${CLAUDE_MODEL_CHAT:-claude-haiku-4-5}
+      CLAUDE_MODEL_RECOMMEND: ${CLAUDE_MODEL_RECOMMEND:-claude-sonnet-5}
+      CLAUDE_MODEL_INSIGHTS: ${CLAUDE_MODEL_INSIGHTS:-claude-sonnet-5}
+      BUSINESS_SERVICE_URL: http://business-service:8082
+      BOOKING_SERVICE_URL: http://booking-service:8083
+    depends_on:
+      - business-service
+      - booking-service
+    restart: unless-stopped
+    networks: [appgym-network]
+
+  api-gateway:
+    image: ghcr.io/${IMAGE_NAMESPACE:-manumost93}/appgym-api-gateway:${IMAGE_TAG:-latest}
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      - auth-service
+      - business-service
+      - booking-service
+      - ai-service
+    restart: unless-stopped
+    networks: [appgym-network]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.api-gateway.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.api-gateway.entrypoints=websecure
+      - traefik.http.routers.api-gateway.tls.certresolver=letsencrypt
+      - traefik.http.services.api-gateway.loadbalancer.server.port=8080
+
+  traefik:
+    image: traefik:v3.2
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge=true
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_letsencrypt:/letsencrypt
+    restart: unless-stopped
+    networks: [appgym-network]
+
+networks:
+  appgym-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  traefik_letsencrypt:
