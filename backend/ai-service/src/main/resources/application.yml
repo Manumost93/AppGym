@@ -1,0 +1,19 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: ai-service
+
+anthropic:
+  api-key: ${ANTHROPIC_API_KEY:}
+  model:
+    chat: ${CLAUDE_MODEL_CHAT:claude-haiku-4-5}
+    recommend: ${CLAUDE_MODEL_RECOMMEND:claude-sonnet-5}
+    insights: ${CLAUDE_MODEL_INSIGHTS:claude-sonnet-5}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
