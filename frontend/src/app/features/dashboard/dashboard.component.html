@@ -28,21 +28,40 @@
           <dd class="text-white">{{ user()!.businessId ?? '—' }}</dd>
         </dl>
 
-        @if (user()!.role === 'SUPER_ADMIN') {
-          <a
-            routerLink="/businesses"
-            class="mt-6 inline-block rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-400"
-          >
-            Gestionar negocios
-          </a>
-        } @else if (user()!.role === 'BUSINESS_ADMIN') {
-          <a
-            routerLink="/my-business"
-            class="mt-6 inline-block rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-400"
-          >
-            Mi negocio
-          </a>
-        }
+        <div class="mt-6 flex flex-wrap gap-3">
+          @if (user()!.role === 'SUPER_ADMIN') {
+            <a
+              routerLink="/businesses"
+              class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-400"
+            >
+              Gestionar negocios
+            </a>
+          }
+          @if (user()!.role === 'BUSINESS_ADMIN') {
+            <a
+              routerLink="/my-business"
+              class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-400"
+            >
+              Mi negocio
+            </a>
+          }
+          @if (user()!.role === 'BUSINESS_ADMIN' || user()!.role === 'STAFF') {
+            <a
+              routerLink="/activities"
+              class="rounded-lg border border-emerald-600 px-4 py-2 text-sm font-medium text-emerald-400 hover:bg-emerald-500/10"
+            >
+              Actividades y horario
+            </a>
+          }
+          @if (user()!.role === 'MEMBER') {
+            <a
+              routerLink="/schedule"
+              class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-400"
+            >
+              Reservar clases y pistas
+            </a>
+          }
+        </div>
       }
     </div>
   </div>

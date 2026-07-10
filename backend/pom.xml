@@ -68,6 +68,11 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
             <release>${java.version}</release>
+            <!-- Sin esto, Spring no puede resolver por reflexion los nombres de
+                 parametros de @PathVariable/@RequestParam/@Query sin valor explicito
+                 (spring-boot-starter-parent lo activa por defecto; nuestro parent
+                 propio no, al no heredar de el). -->
+            <parameters>true</parameters>
           </configuration>
         </plugin>
       </plugins>

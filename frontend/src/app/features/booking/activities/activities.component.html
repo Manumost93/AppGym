@@ -1,0 +1,158 @@
+<div class="min-h-screen bg-slate-950 px-4 py-10">
+  <div class="mx-auto max-w-3xl">
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-semibold text-white">Actividades y horario</h1>
+      <a routerLink="/dashboard" class="text-sm text-slate-400 hover:text-white">← Volver</a>
+    </div>
+
+    <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
+      <h2 class="text-lg font-medium text-white">Nueva actividad</h2>
+      <form class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2" [formGroup]="activityForm" (ngSubmit)="submitActivity()">
+        <div>
+          <label class="block text-sm font-medium text-slate-300">Tipo</label>
+          <select
+            formControlName="type"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          >
+            @for (type of types; track type) {
+              <option [value]="type">{{ type === 'CLASS' ? 'Clase' : 'Pista' }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300">Nombre</label>
+          <input
+            formControlName="name"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+            placeholder="WOD del día / Pista 1"
+          />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-medium text-slate-300">Descripción</label>
+          <input
+            formControlName="description"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300">Cupo</label>
+          <input
+            type="number"
+            formControlName="capacity"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-300">Duración (min)</label>
+          <input
+            type="number"
+            formControlName="durationMinutes"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-medium text-slate-300">Instructor (opcional)</label>
+          <input
+            formControlName="instructorName"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
+
+        @if (errorMessage()) {
+          <p class="sm:col-span-2 text-sm text-red-400">{{ errorMessage() }}</p>
+        }
+
+        <div class="sm:col-span-2">
+          <button
+            type="submit"
+            [disabled]="creatingActivity()"
+            class="rounded-lg bg-emerald-500 px-4 py-2 font-medium text-slate-950 hover:bg-emerald-400 disabled:opacity-50"
+          >
+            {{ creatingActivity() ? 'Creando…' : 'Crear actividad' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
+      <h2 class="text-lg font-medium text-white">Actividades</h2>
+      @if (loading()) {
+        <p class="mt-4 text-slate-400">Cargando…</p>
+      } @else if (activities().length === 0) {
+        <p class="mt-4 text-slate-400">Todavía no hay actividades creadas.</p>
+      } @else {
+        <div class="mt-4 space-y-3">
+          @for (activity of activities(); track activity.id) {
+            <div class="rounded-lg border border-slate-800 p-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium text-white">{{ activity.name }}</p>
+                  <p class="text-xs text-slate-500">
+                    {{ activity.type === 'CLASS' ? 'Clase' : 'Pista' }} · cupo {{ activity.capacity }} ·
+                    {{ activity.durationMinutes }} min
+                    @if (activity.instructorName) {
+                      · {{ activity.instructorName }}
+                    }
+                  </p>
+                </div>
+                <div class="flex gap-2">
+                  <button
+                    (click)="startSlotFor(activity.id)"
+                    class="text-sm text-emerald-400 hover:text-emerald-300"
+                  >
+                    + Franja horaria
+                  </button>
+                  <button (click)="deactivate(activity)" class="text-sm text-red-400 hover:text-red-300">
+                    Desactivar
+                  </button>
+                </div>
+              </div>
+
+              @if (creatingSlotFor() === activity.id) {
+                <form
+                  class="mt-3 flex items-end gap-2 border-t border-slate-800 pt-3"
+                  [formGroup]="slotForm"
+                  (ngSubmit)="submitSlot(activity.id)"
+                >
+                  <div class="flex-1">
+                    <label class="block text-xs font-medium text-slate-400">Fecha y hora de inicio</label>
+                    <input
+                      type="datetime-local"
+                      formControlName="startTime"
+                      class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    class="rounded-lg bg-emerald-500 px-3 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-400"
+                  >
+                    Crear
+                  </button>
+                </form>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
+      <h2 class="text-lg font-medium text-white">Próximas franjas horarias</h2>
+      @if (slots().length === 0) {
+        <p class="mt-4 text-slate-400">Todavía no hay franjas horarias programadas.</p>
+      } @else {
+        <div class="mt-4 space-y-2">
+          @for (slot of slots(); track slot.id) {
+            <div class="flex items-center justify-between rounded-lg border border-slate-800 p-3 text-sm">
+              <div>
+                <p class="text-white">{{ slot.activityName }}</p>
+                <p class="text-slate-500">{{ slot.startTime | date: 'short' }}</p>
+              </div>
+              <span class="text-slate-400">{{ slot.confirmedCount }}/{{ slot.capacity }} · {{ slot.waitlistCount }} en espera</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

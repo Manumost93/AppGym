@@ -65,6 +65,23 @@ services:
         condition: service_healthy
     networks: [appgym-network]
 
+  booking-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE: booking-service
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: booking_db
+      DB_USER: booking_user
+      DB_PASSWORD: ${BOOKING_DB_PASSWORD:-booking_dev}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [appgym-network]
+
   api-gateway:
     build:
       context: ../backend
@@ -81,6 +98,7 @@ services:
     depends_on:
       - auth-service
       - business-service
+      - booking-service
     networks: [appgym-network]
 
   frontend:

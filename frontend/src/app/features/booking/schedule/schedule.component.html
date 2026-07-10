@@ -1,0 +1,88 @@
+<div class="min-h-screen bg-slate-950 px-4 py-10">
+  <div class="mx-auto max-w-3xl">
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-semibold text-white">Reservar clases y pistas</h1>
+      <a routerLink="/dashboard" class="text-sm text-slate-400 hover:text-white">← Volver</a>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="mt-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{{ errorMessage() }}</div>
+    }
+
+    <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
+      <h2 class="text-lg font-medium text-white">Próximas franjas horarias</h2>
+      @if (loading()) {
+        <p class="mt-4 text-slate-400">Cargando…</p>
+      } @else if (slots().length === 0) {
+        <p class="mt-4 text-slate-400">No hay franjas horarias disponibles todavía.</p>
+      } @else {
+        <div class="mt-4 space-y-3">
+          @for (slot of slots(); track slot.id) {
+            <div class="flex items-center justify-between rounded-lg border border-slate-800 p-4">
+              <div>
+                <p class="font-medium text-white">{{ slot.activityName }}</p>
+                <p class="text-sm text-slate-400">
+                  {{ slot.startTime | date: 'short' }}
+                  @if (slot.instructorName) {
+                    · {{ slot.instructorName }}
+                  }
+                </p>
+                <p class="text-xs text-slate-500">{{ slot.confirmedCount }}/{{ slot.capacity }} plazas ocupadas</p>
+              </div>
+
+              @if (activeBookingForSlot(slot.id); as existing) {
+                <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
+                  {{ existing.status === 'CONFIRMED' ? 'Reservado' : 'En lista de espera' }}
+                </span>
+              } @else {
+                <button
+                  (click)="book(slot)"
+                  [disabled]="bookingSlotId() === slot.id"
+                  class="rounded-lg bg-emerald-500 px-3 py-1.5 text-sm font-medium text-slate-950 hover:bg-emerald-400 disabled:opacity-50"
+                >
+                  {{ slot.full ? 'Unirse a la lista de espera' : 'Reservar' }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
+      <h2 class="text-lg font-medium text-white">Mis reservas</h2>
+      @if (myBookings().length === 0) {
+        <p class="mt-4 text-slate-400">Todavía no tienes reservas.</p>
+      } @else {
+        <div class="mt-4 space-y-2">
+          @for (booking of myBookings(); track booking.id) {
+            <div class="flex items-center justify-between rounded-lg border border-slate-800 p-3 text-sm">
+              <div>
+                <p class="text-white">{{ booking.activityName }}</p>
+                @if (booking.slotStartTime) {
+                  <p class="text-slate-500">{{ booking.slotStartTime | date: 'short' }}</p>
+                }
+              </div>
+              <div class="flex items-center gap-3">
+                <span
+                  class="rounded-full px-2 py-0.5 text-xs"
+                  [class.bg-emerald-500/10]="booking.status === 'CONFIRMED'"
+                  [class.text-emerald-400]="booking.status === 'CONFIRMED'"
+                  [class.bg-amber-500/10]="booking.status === 'WAITLIST'"
+                  [class.text-amber-400]="booking.status === 'WAITLIST'"
+                  [class.bg-slate-800]="booking.status === 'CANCELLED'"
+                  [class.text-slate-500]="booking.status === 'CANCELLED'"
+                >
+                  {{ booking.status }}
+                </span>
+                @if (booking.status !== 'CANCELLED') {
+                  <button (click)="cancel(booking)" class="text-red-400 hover:text-red-300">Cancelar</button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
