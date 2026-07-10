@@ -1,0 +1,33 @@
+<div class="min-h-screen bg-slate-950 px-4 py-10">
+  <div class="mx-auto max-w-2xl">
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-semibold text-white">AppGym</h1>
+      <button
+        (click)="logout()"
+        class="rounded-lg border border-slate-700 px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-800"
+      >
+        Cerrar sesión
+      </button>
+    </div>
+
+    <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
+      @if (loading()) {
+        <p class="text-slate-400">Verificando sesión a través del gateway…</p>
+      } @else if (errorMessage()) {
+        <p class="text-red-400">{{ errorMessage() }}</p>
+      } @else if (user()) {
+        <p class="text-sm text-emerald-400">✓ JWT validado por api-gateway y propagado a auth-service</p>
+        <dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+          <dt class="text-slate-500">Nombre</dt>
+          <dd class="text-white">{{ user()!.fullName }}</dd>
+          <dt class="text-slate-500">Email</dt>
+          <dd class="text-white">{{ user()!.email }}</dd>
+          <dt class="text-slate-500">Rol</dt>
+          <dd class="text-white">{{ user()!.role }}</dd>
+          <dt class="text-slate-500">Business ID</dt>
+          <dd class="text-white">{{ user()!.businessId ?? '—' }}</dd>
+        </dl>
+      }
+    </div>
+  </div>
+</div>

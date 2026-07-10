@@ -1,9 +1,12 @@
 package com.appgym.auth;
 
+import com.appgym.auth.config.JwtProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
+@EnableConfigurationProperties(JwtProperties.class)
 public class AuthServiceApplication {
 
     public static void main(String[] args) {

@@ -1,0 +1,84 @@
+<div class="min-h-screen flex items-center justify-center bg-slate-950 px-4 py-10">
+  <div class="w-full max-w-sm rounded-2xl bg-slate-900 p-8 shadow-xl ring-1 ring-slate-800">
+    <h1 class="text-2xl font-semibold text-white">Crear cuenta</h1>
+    <p class="mt-1 text-sm text-slate-400">Únete a AppGym</p>
+
+    <form class="mt-6 space-y-4" [formGroup]="form" (ngSubmit)="submit()">
+      <div>
+        <label class="block text-sm font-medium text-slate-300" for="fullName">Nombre completo</label>
+        <input
+          id="fullName"
+          type="text"
+          formControlName="fullName"
+          class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-300" for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-300" for="password">Contraseña</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-300" for="role">Rol</label>
+        <select
+          id="role"
+          formControlName="role"
+          class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+        >
+          @for (role of roles; track role) {
+            <option [value]="role">{{ role }}</option>
+          }
+        </select>
+      </div>
+
+      @if (requiresBusinessId()) {
+        <div>
+          <label class="block text-sm font-medium text-slate-300" for="businessId">
+            Business ID
+            <span class="font-normal text-slate-500">(disponible desde la Fase 2)</span>
+          </label>
+          <input
+            id="businessId"
+            type="text"
+            formControlName="businessId"
+            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+            placeholder="UUID del negocio"
+          />
+        </div>
+      }
+
+      @if (errorMessage()) {
+        <p class="text-sm text-red-400">{{ errorMessage() }}</p>
+      }
+
+      <button
+        type="submit"
+        [disabled]="loading()"
+        class="w-full rounded-lg bg-emerald-500 px-4 py-2 font-medium text-slate-950 transition hover:bg-emerald-400 disabled:opacity-50"
+      >
+        {{ loading() ? 'Creando cuenta…' : 'Crear cuenta' }}
+      </button>
+    </form>
+
+    <p class="mt-6 text-center text-sm text-slate-400">
+      ¿Ya tienes cuenta?
+      <a routerLink="/login" class="font-medium text-emerald-400 hover:text-emerald-300">Inicia sesión</a>
+    </p>
+  </div>
+</div>

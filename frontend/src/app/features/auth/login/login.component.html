@@ -1,0 +1,47 @@
+<div class="min-h-screen flex items-center justify-center bg-slate-950 px-4">
+  <div class="w-full max-w-sm rounded-2xl bg-slate-900 p-8 shadow-xl ring-1 ring-slate-800">
+    <h1 class="text-2xl font-semibold text-white">AppGym</h1>
+    <p class="mt-1 text-sm text-slate-400">Accede a tu cuenta</p>
+
+    <form class="mt-6 space-y-4" [formGroup]="form" (ngSubmit)="submit()">
+      <div>
+        <label class="block text-sm font-medium text-slate-300" for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          placeholder="tu@email.com"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-slate-300" for="password">Contraseña</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          placeholder="••••••••"
+        />
+      </div>
+
+      @if (errorMessage()) {
+        <p class="text-sm text-red-400">{{ errorMessage() }}</p>
+      }
+
+      <button
+        type="submit"
+        [disabled]="loading()"
+        class="w-full rounded-lg bg-emerald-500 px-4 py-2 font-medium text-slate-950 transition hover:bg-emerald-400 disabled:opacity-50"
+      >
+        {{ loading() ? 'Entrando…' : 'Entrar' }}
+      </button>
+    </form>
+
+    <p class="mt-6 text-center text-sm text-slate-400">
+      ¿No tienes cuenta?
+      <a routerLink="/register" class="font-medium text-emerald-400 hover:text-emerald-300">Regístrate</a>
+    </p>
+  </div>
+</div>

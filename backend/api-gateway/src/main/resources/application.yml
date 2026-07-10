@@ -37,6 +37,13 @@ spring:
 jwt:
   secret: ${JWT_SECRET:}
 
+security:
+  public-paths:
+    - /api/auth/register
+    - /api/auth/login
+    - /api/auth/refresh
+    - /actuator/**
+
 management:
   endpoints:
     web:

@@ -26,6 +26,55 @@ services:
       - "6379:6379"
     networks: [appgym-network]
 
+  auth-service:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE: auth-service
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: auth_db
+      DB_USER: auth_user
+      DB_PASSWORD: ${AUTH_DB_PASSWORD:-auth_dev}
+      JWT_SECRET: ${JWT_SECRET:-dev-only-jwt-secret-please-change-in-production-1234567890}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks: [appgym-network]
+
+  api-gateway:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE: api-gateway
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-dev-only-jwt-secret-please-change-in-production-1234567890}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:4200}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+    networks: [appgym-network]
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+    depends_on:
+      - api-gateway
+    networks: [appgym-network]
+
 networks:
   appgym-network:
     driver: bridge
