@@ -1,10 +1,40 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { BookingService } from '../../../core/booking/booking.service';
 import { Booking, ScheduleSlot } from '../../../core/booking/booking.models';
 import { AiService } from '../../../core/ai/ai.service';
 import { RecommendationResponse } from '../../../core/ai/ai.models';
+import { BusinessService } from '../../../core/business/business.service';
+import { Business, BusinessType } from '../../../core/business/business.models';
+
+interface DisciplineHero {
+  image: string;
+  heading: string;
+  subheading: string;
+  slotsTitle: string;
+}
+
+const DISCIPLINE_HERO: Record<BusinessType, DisciplineHero> = {
+  GYM: {
+    image: 'https://images.pexels.com/photos/29224211/pexels-photo-29224211.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    heading: 'Tu gimnasio',
+    subheading: 'Clases dirigidas y sala de musculación',
+    slotsTitle: 'Próximas clases',
+  },
+  CROSSFIT_BOX: {
+    image: 'https://images.pexels.com/photos/37972529/pexels-photo-37972529.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    heading: 'Tu box',
+    subheading: 'WODs y entrenamientos del día',
+    slotsTitle: 'Próximos WODs',
+  },
+  PADEL_CLUB: {
+    image: 'https://images.pexels.com/photos/32897040/pexels-photo-32897040.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    heading: 'Tu club de pádel',
+    subheading: 'Reserva de pistas por franja horaria',
+    slotsTitle: 'Próximas franjas de pista',
+  },
+};
 
 @Component({
   selector: 'app-schedule',
@@ -15,6 +45,7 @@ import { RecommendationResponse } from '../../../core/ai/ai.models';
 export class ScheduleComponent implements OnInit {
   private readonly bookingService = inject(BookingService);
   private readonly aiService = inject(AiService);
+  private readonly businessService = inject(BusinessService);
 
   readonly slots = signal<ScheduleSlot[]>([]);
   readonly myBookings = signal<Booking[]>([]);
@@ -22,12 +53,25 @@ export class ScheduleComponent implements OnInit {
   readonly errorMessage = signal<string | null>(null);
   readonly bookingSlotId = signal<string | null>(null);
 
+  readonly business = signal<Business | null>(null);
+  readonly hero = computed<DisciplineHero | null>(() => {
+    const business = this.business();
+    return business ? DISCIPLINE_HERO[business.type] : null;
+  });
+
   readonly recommendation = signal<RecommendationResponse | null>(null);
   readonly loadingRecommendation = signal(true);
 
   ngOnInit(): void {
     this.reload();
     this.loadRecommendation();
+    this.businessService.getMyBusiness().subscribe({
+      next: (business) => this.business.set(business),
+      error: () => {
+        // Si no se puede resolver el negocio (p. ej. datos de demo incompletos),
+        // la pagina sigue funcionando con la cabecera generica.
+      },
+    });
   }
 
   reload(): void {

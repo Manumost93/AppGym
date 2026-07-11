@@ -38,7 +38,7 @@ public class DemoDataSeeder implements ApplicationRunner {
             return;
         }
 
-        Business business = new Business(
+        businessRepository.save(new Business(
                 DemoSeedIds.BUSINESS_ID,
                 "AppGym Demo Box",
                 BusinessType.CROSSFIT_BOX,
@@ -47,14 +47,42 @@ public class DemoDataSeeder implements ApplicationRunner {
                 "+34 600 000 000",
                 "Calle de Ejemplo 1, Madrid",
                 "#10b981"
-        );
-        businessRepository.save(business);
-
+        ));
         membershipPlanRepository.save(new MembershipPlan(DemoSeedIds.BUSINESS_ID, "Mensual Ilimitado",
-                "Acceso libre a todas las clases durante 30 dias.", 4900, "EUR", 30));
+                "Acceso libre a todos los WODs durante 30 dias.", 4900, "EUR", 30));
         membershipPlanRepository.save(new MembershipPlan(DemoSeedIds.BUSINESS_ID, "Bono 10 clases",
                 "10 clases a elegir, validas durante 60 dias.", 6900, "EUR", 60));
 
-        log.info("Datos de demostracion sembrados: 1 negocio + 2 planes de membresia");
+        businessRepository.save(new Business(
+                DemoSeedIds.BUSINESS_ID_GYM,
+                "AppGym Demo Fitness Club",
+                BusinessType.GYM,
+                "Gimnasio de demostracion para el portfolio de AppGym.",
+                "hola@appgym.demo",
+                "+34 600 000 001",
+                "Avenida del Deporte 22, Madrid",
+                "#10b981"
+        ));
+        membershipPlanRepository.save(new MembershipPlan(DemoSeedIds.BUSINESS_ID_GYM, "Mensual Ilimitado",
+                "Acceso libre a sala de musculacion y clases dirigidas durante 30 dias.", 3900, "EUR", 30));
+        membershipPlanRepository.save(new MembershipPlan(DemoSeedIds.BUSINESS_ID_GYM, "Trimestral",
+                "Acceso libre durante 90 dias, con descuento frente al mensual.", 9900, "EUR", 90));
+
+        businessRepository.save(new Business(
+                DemoSeedIds.BUSINESS_ID_PADEL,
+                "AppGym Demo Padel Club",
+                BusinessType.PADEL_CLUB,
+                "Club de padel de demostracion para el portfolio de AppGym.",
+                "hola@appgym.demo",
+                "+34 600 000 002",
+                "Paseo de la Pista 5, Madrid",
+                "#10b981"
+        ));
+        membershipPlanRepository.save(new MembershipPlan(DemoSeedIds.BUSINESS_ID_PADEL, "Bono 5 partidos",
+                "5 reservas de pista, validas durante 45 dias.", 4500, "EUR", 45));
+        membershipPlanRepository.save(new MembershipPlan(DemoSeedIds.BUSINESS_ID_PADEL, "Socio Padel",
+                "Reservas ilimitadas de pista durante 30 dias.", 5900, "EUR", 30));
+
+        log.info("Datos de demostracion sembrados: 3 negocios (gimnasio, box de crossfit, club de padel) + planes de membresia");
     }
 }

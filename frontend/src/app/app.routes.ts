@@ -44,6 +44,11 @@ export const routes: Routes = [
       import('./features/booking/activities/activities.component').then((m) => m.ActivitiesComponent),
   },
   {
+    path: 'clients',
+    canActivate: [authGuard, roleGuard(['BUSINESS_ADMIN'])],
+    loadComponent: () => import('./features/clients/clients.component').then((m) => m.ClientsComponent),
+  },
+  {
     path: 'schedule',
     canActivate: [authGuard, roleGuard(['MEMBER'])],
     loadComponent: () =>

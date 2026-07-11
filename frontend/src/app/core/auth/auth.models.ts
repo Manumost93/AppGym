@@ -1,4 +1,5 @@
 export type Role = 'SUPER_ADMIN' | 'BUSINESS_ADMIN' | 'STAFF' | 'MEMBER';
+export type ClientStatus = 'PENDING' | 'ACTIVE' | 'REJECTED';
 
 export interface UserResponse {
   id: string;
@@ -6,13 +7,20 @@ export interface UserResponse {
   fullName: string;
   role: Role;
   businessId: string | null;
+  status: ClientStatus;
+  paid: boolean;
 }
 
 export interface AuthResponse {
-  accessToken: string;
-  refreshToken: string;
+  accessToken: string | null;
+  refreshToken: string | null;
   expiresInSeconds: number;
   user: UserResponse;
+}
+
+export interface UpdateClientRequest {
+  status?: ClientStatus;
+  paid?: boolean;
 }
 
 export interface LoginRequest {

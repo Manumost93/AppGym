@@ -2,7 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { AuthResponse, LoginRequest, RegisterRequest, UserResponse } from './auth.models';
+import {
+  AuthResponse,
+  LoginRequest,
+  RegisterRequest,
+  UpdateClientRequest,
+  UserResponse,
+} from './auth.models';
 
 const ACCESS_TOKEN_KEY = 'appgym.accessToken';
 const REFRESH_TOKEN_KEY = 'appgym.refreshToken';
@@ -17,9 +23,27 @@ export class AuthService {
   constructor(private readonly http: HttpClient) {}
 
   register(request: RegisterRequest): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/register`, request)
-      .pipe(tap((response) => this.storeSession(response)));
+    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, request).pipe(
+      tap((response) => {
+        // Un socio (MEMBER) recien registrado queda PENDING de aprobacion y no
+        // recibe tokens: no hay sesion que guardar todavia.
+        if (response.accessToken) {
+          this.storeSession(response);
+        }
+      }),
+    );
+  }
+
+  listClients(): Observable<UserResponse[]> {
+    return this.http.get<UserResponse[]>(`${environment.apiUrl}/auth/clients`);
+  }
+
+  updateClient(clientId: string, request: UpdateClientRequest): Observable<UserResponse> {
+    return this.http.patch<UserResponse>(`${environment.apiUrl}/auth/clients/${clientId}`, request);
+  }
+
+  deleteClient(clientId: string): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/auth/clients/${clientId}`);
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {
@@ -57,8 +81,8 @@ export class AuthService {
   }
 
   private storeSession(response: AuthResponse): void {
-    localStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken);
-    localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
+    localStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken!);
+    localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken!);
     this.storeUser(response.user);
   }
 

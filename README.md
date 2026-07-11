@@ -52,11 +52,18 @@ Contraseña común: **`Demo1234!`**
 | Rol | Email | Qué puede hacer |
 |---|---|---|
 | Super admin | `admin@appgym.demo` | Gestiona todos los negocios de la plataforma. |
-| Administrador de negocio | `owner@appgym.demo` | Gestiona su box: planes, staff, actividades. |
-| Staff | `staff@appgym.demo` | Gestiona actividades y horarios del negocio. |
+| Admin del box de crossfit | `owner@appgym.demo` | Gestiona el box: planes, clientes, staff, actividades. |
+| Admin del gimnasio | `gym-owner@appgym.demo` | Gestiona el gimnasio: planes, clientes, clases. |
+| Admin del club de pádel | `padel-owner@appgym.demo` | Gestiona el club: planes, clientes, pistas. |
+| Staff | `staff@appgym.demo` | Gestiona actividades y horarios del box de crossfit. |
 | Socio | `member@appgym.demo` | Reserva clases/pistas y usa el asistente de IA. |
+| Socio pendiente | `pending@appgym.demo` | Cuenta de ejemplo con la solicitud sin aprobar todavía (no puede iniciar sesión). |
 
-Ya existen un negocio demo ("AppGym Demo Box"), 2 planes de membresía, 2 actividades (clase WOD + pista de pádel) con varias franjas horarias, y una reserva confirmada de ejemplo.
+Hay 3 negocios demo, uno por disciplina, cada uno con sus propias actividades, horarios y planes de membresía: un gimnasio (spinning, yoga), un box de crossfit (WOD, halterofilia) y un club de pádel (2 pistas).
+
+### Alta de nuevos socios y aprobación
+
+Desde la landing, al pinchar en una de las 3 disciplinas se abre un registro con el negocio ya preseleccionado. La cuenta creada queda **pendiente de aprobación** y no puede iniciar sesión todavía. El administrador de ese negocio revisa las solicitudes en **Gestión de clientes** (`/clients`, enlazado desde su panel): puede aceptar, rechazar, marcar como pagado/no pagado o eliminar a cada socio. Una vez aceptado, el socio ya puede iniciar sesión con normalidad y accede directamente a la página de reservas de su negocio (no hay notificaciones en tiempo real: el efecto se ve la próxima vez que el socio inicia sesión).
 
 ## Documentación
 

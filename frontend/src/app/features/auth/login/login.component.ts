@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -46,14 +47,25 @@ export class LoginComponent {
         password: this.form.value.password!,
       })
       .subscribe({
-        next: () => {
+        next: (response) => {
           this.loading.set(false);
-          this.router.navigate(['/dashboard']);
+          // A un socio lo llevamos directo a la pagina de reservas de su
+          // negocio; el resto de roles pasan por el panel general.
+          const target = response.user.role === 'MEMBER' ? '/schedule' : '/dashboard';
+          this.router.navigate([target]);
         },
-        error: () => {
+        error: (err: HttpErrorResponse) => {
           this.loading.set(false);
-          this.errorMessage.set('Email o contraseña incorrectos.');
+          this.errorMessage.set(this.resolveErrorMessage(err));
         },
       });
+  }
+
+  private resolveErrorMessage(err: HttpErrorResponse): string {
+    const code = err.error?.error;
+    if (code === 'ACCOUNT_PENDING' || code === 'ACCOUNT_REJECTED') {
+      return err.error.message;
+    }
+    return 'Email o contraseña incorrectos.';
   }
 }

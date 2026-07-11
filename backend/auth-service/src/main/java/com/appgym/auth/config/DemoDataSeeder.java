@@ -1,6 +1,7 @@
 package com.appgym.auth.config;
 
 import com.appgym.auth.domain.User;
+import com.appgym.auth.domain.UserStatus;
 import com.appgym.auth.repository.UserRepository;
 import com.appgym.common.demo.DemoSeedIds;
 import com.appgym.common.dto.Role;
@@ -43,12 +44,21 @@ public class DemoDataSeeder implements ApplicationRunner {
         userRepository.save(new User(DemoSeedIds.SUPER_ADMIN_USER_ID, DemoSeedIds.SUPER_ADMIN_EMAIL, hash,
                 "Admin Demo", Role.SUPER_ADMIN, null));
         userRepository.save(new User(DemoSeedIds.BUSINESS_ADMIN_USER_ID, DemoSeedIds.BUSINESS_ADMIN_EMAIL, hash,
-                "Dueno Demo", Role.BUSINESS_ADMIN, DemoSeedIds.BUSINESS_ID));
+                "Dueno Demo (Crossfit)", Role.BUSINESS_ADMIN, DemoSeedIds.BUSINESS_ID));
+        userRepository.save(new User(DemoSeedIds.GYM_ADMIN_USER_ID, DemoSeedIds.GYM_ADMIN_EMAIL, hash,
+                "Dueno Demo (Gimnasio)", Role.BUSINESS_ADMIN, DemoSeedIds.BUSINESS_ID_GYM));
+        userRepository.save(new User(DemoSeedIds.PADEL_ADMIN_USER_ID, DemoSeedIds.PADEL_ADMIN_EMAIL, hash,
+                "Dueno Demo (Padel)", Role.BUSINESS_ADMIN, DemoSeedIds.BUSINESS_ID_PADEL));
         userRepository.save(new User(DemoSeedIds.STAFF_USER_ID, DemoSeedIds.STAFF_EMAIL, hash,
                 "Entrenador Demo", Role.STAFF, DemoSeedIds.BUSINESS_ID));
         userRepository.save(new User(DemoSeedIds.MEMBER_USER_ID, DemoSeedIds.MEMBER_EMAIL, hash,
                 "Socio Demo", Role.MEMBER, DemoSeedIds.BUSINESS_ID));
 
-        log.info("Datos de demostracion sembrados: 4 usuarios (ver README.md para las credenciales)");
+        User pendingMember = new User(DemoSeedIds.PENDING_MEMBER_USER_ID, DemoSeedIds.PENDING_MEMBER_EMAIL, hash,
+                "Solicitante Demo", Role.MEMBER, DemoSeedIds.BUSINESS_ID);
+        pendingMember.setStatus(UserStatus.PENDING);
+        userRepository.save(pendingMember);
+
+        log.info("Datos de demostracion sembrados: 7 usuarios (ver README.md para las credenciales)");
     }
 }

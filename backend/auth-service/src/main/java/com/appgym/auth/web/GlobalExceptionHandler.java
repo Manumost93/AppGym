@@ -3,6 +3,7 @@ package com.appgym.auth.web;
 import com.appgym.auth.service.AuthService;
 import com.appgym.auth.service.RefreshTokenService;
 import com.appgym.common.dto.ApiError;
+import com.appgym.common.security.ForbiddenException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -47,6 +48,23 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ApiError> handleNotFound(NoSuchElementException ex, HttpServletRequest req) {
         return build(HttpStatus.NOT_FOUND, ex.getMessage(), req);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ApiError> handleForbidden(ForbiddenException ex, HttpServletRequest req) {
+        return build(HttpStatus.FORBIDDEN, ex.getMessage(), req);
+    }
+
+    /**
+     * Cuenta valida (email+password correctos) pero PENDING o REJECTED: se
+     * devuelve el codigo en el campo "error" del ApiError en vez del generico
+     * "Forbidden", para que el frontend pueda distinguir este caso de un 403
+     * de autorizacion normal y mostrar un mensaje especifico.
+     */
+    @ExceptionHandler(AuthService.AccountNotActiveException.class)
+    public ResponseEntity<ApiError> handleAccountNotActive(AuthService.AccountNotActiveException ex, HttpServletRequest req) {
+        ApiError error = ApiError.of(HttpStatus.FORBIDDEN.value(), ex.getCode(), ex.getMessage(), req.getRequestURI());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 
     private ResponseEntity<ApiError> build(HttpStatus status, String message, HttpServletRequest req) {

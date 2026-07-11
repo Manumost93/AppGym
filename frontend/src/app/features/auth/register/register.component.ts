@@ -21,9 +21,18 @@ export class RegisterComponent {
   readonly errorMessage = signal<string | null>(null);
   readonly loading = signal(false);
 
-  // Cuando llega desde "Mi negocio" -> "Dar de alta staff", el rol y el negocio
-  // vienen fijados por query params y no deben poder cambiarse desde el formulario.
+  // Cuando llega desde "Mi negocio" -> "Dar de alta staff", o desde una tarjeta
+  // de disciplina en la landing, el rol y el negocio vienen fijados por query
+  // params y no deben poder cambiarse desde el formulario.
   readonly lockedFields = signal(false);
+
+  // true si el registro bloqueado es el de un socio uniendose a un negocio
+  // (en vez de un alta de staff hecha por su administrador).
+  readonly isMemberJoin = signal(false);
+
+  // Se marca a true cuando el registro de un socio queda pendiente de
+  // aprobacion: no hay sesion que iniciar todavia, solo mostramos confirmacion.
+  readonly pendingApproval = signal(false);
 
   readonly form = this.fb.group({
     fullName: ['', [Validators.required]],
@@ -40,6 +49,7 @@ export class RegisterComponent {
 
     if (presetRole && presetBusinessId) {
       this.lockedFields.set(true);
+      this.isMemberJoin.set(presetRole === 'MEMBER');
       this.form.patchValue({ role: presetRole, businessId: presetBusinessId });
       this.form.get('role')?.disable();
       this.form.get('businessId')?.disable();
@@ -70,8 +80,12 @@ export class RegisterComponent {
         businessId: value.businessId || null,
       })
       .subscribe({
-        next: () => {
+        next: (response) => {
           this.loading.set(false);
+          if (!response.accessToken) {
+            this.pendingApproval.set(true);
+            return;
+          }
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {

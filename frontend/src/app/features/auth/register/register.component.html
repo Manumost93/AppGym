@@ -1,87 +1,117 @@
-<div class="min-h-screen flex items-center justify-center bg-slate-950 px-4 py-10">
-  <div class="w-full max-w-sm rounded-2xl bg-slate-900 p-8 shadow-xl ring-1 ring-slate-800">
-    <h1 class="text-2xl font-semibold text-white">Crear cuenta</h1>
-    <p class="mt-1 text-sm text-slate-400">Únete a AppGym</p>
-
-    <form class="mt-6 space-y-4" [formGroup]="form" (ngSubmit)="submit()">
-      <div>
-        <label class="block text-sm font-medium text-slate-300" for="fullName">Nombre completo</label>
-        <input
-          id="fullName"
-          type="text"
-          formControlName="fullName"
-          class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
-        />
+<div class="bg-grid relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-4 py-10">
+  <div class="pointer-events-none absolute -top-40 left-[-10%] h-96 w-96 rounded-full bg-emerald-500/15 blur-[120px]"></div>
+  <div class="relative w-full max-w-sm rounded-2xl border border-white/10 bg-zinc-950/80 p-8 shadow-[0_0_60px_-20px_rgba(16,185,129,0.35)] backdrop-blur">
+    @if (pendingApproval()) {
+      <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" />
+        </svg>
       </div>
+      <h1 class="font-display mt-4 text-2xl font-extrabold text-white">Solicitud enviada</h1>
+      <p class="mt-2 text-sm text-slate-400">
+        Hemos recibido tu solicitud para unirte. El administrador del negocio la revisará y te dará
+        acceso en cuanto la acepte. Podrás iniciar sesión normalmente cuando eso ocurra.
+      </p>
+      <a
+        routerLink="/login"
+        class="mt-6 block w-full rounded-lg bg-emerald-500 px-4 py-2 text-center font-medium text-black shadow-[0_0_25px_-5px_rgba(16,185,129,0.7)] transition hover:bg-emerald-400"
+        >Volver al inicio de sesión</a
+      >
+    } @else {
+      <h1 class="font-display text-2xl font-extrabold text-white">
+        {{ isMemberJoin() ? 'Únete al negocio' : 'Crear cuenta' }}
+      </h1>
+      <p class="mt-1 text-sm text-slate-400">
+        {{ isMemberJoin() ? 'Tu solicitud pasará a revisión del administrador.' : 'Únete a AppGym' }}
+      </p>
 
-      <div>
-        <label class="block text-sm font-medium text-slate-300" for="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
-        />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-slate-300" for="password">Contraseña</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
-        />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-slate-300" for="role">Rol</label>
-        <select
-          id="role"
-          formControlName="role"
-          class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
-        >
-          @for (role of roles; track role) {
-            <option [value]="role">{{ role }}</option>
-          }
-        </select>
-      </div>
-
-      @if (lockedFields()) {
-        <p class="text-xs text-slate-500">
-          Estás dando de alta un miembro del staff de tu negocio: el rol y el negocio ya vienen fijados.
-        </p>
-      }
-
-      @if (requiresBusinessId()) {
+      <form class="mt-6 space-y-4" [formGroup]="form" (ngSubmit)="submit()">
         <div>
-          <label class="block text-sm font-medium text-slate-300" for="businessId">Business ID</label>
+          <label class="block text-sm font-medium text-slate-300" for="fullName">Nombre completo</label>
           <input
-            id="businessId"
+            id="fullName"
             type="text"
-            formControlName="businessId"
-            class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500 disabled:opacity-60"
-            placeholder="UUID del negocio"
+            formControlName="fullName"
+            class="mt-1 w-full rounded-lg border border-white/10 bg-black px-3 py-2 text-white outline-none focus:border-emerald-500"
           />
         </div>
-      }
 
-      @if (errorMessage()) {
-        <p class="text-sm text-red-400">{{ errorMessage() }}</p>
-      }
+        <div>
+          <label class="block text-sm font-medium text-slate-300" for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="mt-1 w-full rounded-lg border border-white/10 bg-black px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
 
-      <button
-        type="submit"
-        [disabled]="loading()"
-        class="w-full rounded-lg bg-emerald-500 px-4 py-2 font-medium text-slate-950 transition hover:bg-emerald-400 disabled:opacity-50"
-      >
-        {{ loading() ? 'Creando cuenta…' : 'Crear cuenta' }}
-      </button>
-    </form>
+        <div>
+          <label class="block text-sm font-medium text-slate-300" for="password">Contraseña</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            class="mt-1 w-full rounded-lg border border-white/10 bg-black px-3 py-2 text-white outline-none focus:border-emerald-500"
+          />
+        </div>
 
-    <p class="mt-6 text-center text-sm text-slate-400">
-      ¿Ya tienes cuenta?
-      <a routerLink="/login" class="font-medium text-emerald-400 hover:text-emerald-300">Inicia sesión</a>
-    </p>
+        @if (!lockedFields()) {
+          <div>
+            <label class="block text-sm font-medium text-slate-300" for="role">Rol</label>
+            <select
+              id="role"
+              formControlName="role"
+              class="mt-1 w-full rounded-lg border border-white/10 bg-black px-3 py-2 text-white outline-none focus:border-emerald-500"
+            >
+              @for (role of roles; track role) {
+                <option [value]="role">{{ role }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        @if (lockedFields()) {
+          <p class="text-xs text-slate-500">
+            @if (isMemberJoin()) {
+              Te vas a unir a este negocio como socio: un administrador debe aceptar tu solicitud antes de
+              que puedas entrar.
+            } @else {
+              Estás dando de alta un miembro del staff de tu negocio: el rol y el negocio ya vienen fijados.
+            }
+          </p>
+        }
+
+        @if (requiresBusinessId() && !lockedFields()) {
+          <div>
+            <label class="block text-sm font-medium text-slate-300" for="businessId">Business ID</label>
+            <input
+              id="businessId"
+              type="text"
+              formControlName="businessId"
+              class="mt-1 w-full rounded-lg border border-white/10 bg-black px-3 py-2 text-white outline-none focus:border-emerald-500 disabled:opacity-60"
+              placeholder="UUID del negocio"
+            />
+          </div>
+        }
+
+        @if (errorMessage()) {
+          <p class="text-sm text-red-400">{{ errorMessage() }}</p>
+        }
+
+        <button
+          type="submit"
+          [disabled]="loading()"
+          class="w-full rounded-lg bg-emerald-500 px-4 py-2 font-medium text-black shadow-[0_0_25px_-5px_rgba(16,185,129,0.7)] transition hover:bg-emerald-400 disabled:opacity-50"
+        >
+          {{ loading() ? 'Creando cuenta…' : isMemberJoin() ? 'Enviar solicitud' : 'Crear cuenta' }}
+        </button>
+      </form>
+
+      <p class="mt-6 text-center text-sm text-slate-400">
+        ¿Ya tienes cuenta?
+        <a routerLink="/login" class="font-medium text-emerald-400 hover:text-emerald-300">Inicia sesión</a>
+      </p>
+    }
   </div>
 </div>

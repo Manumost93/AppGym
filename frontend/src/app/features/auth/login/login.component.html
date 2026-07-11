@@ -1,6 +1,9 @@
-<div class="min-h-screen flex items-center justify-center bg-slate-950 px-4">
-  <div class="w-full max-w-sm rounded-2xl bg-slate-900 p-8 shadow-xl ring-1 ring-slate-800">
-    <h1 class="text-2xl font-semibold text-white">AppGym</h1>
+<div class="bg-grid relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-4">
+  <div class="pointer-events-none absolute -top-40 right-[-10%] h-96 w-96 rounded-full bg-emerald-500/15 blur-[120px]"></div>
+  <div class="relative w-full max-w-sm rounded-2xl border border-white/10 bg-zinc-950/80 p-8 shadow-[0_0_60px_-20px_rgba(16,185,129,0.35)] backdrop-blur">
+    <h1 class="font-display text-2xl font-extrabold text-white">
+      App<span class="text-emerald-400">Gym</span>
+    </h1>
     <p class="mt-1 text-sm text-slate-400">Accede a tu cuenta</p>
 
     <form class="mt-6 space-y-4" [formGroup]="form" (ngSubmit)="submit()">
@@ -10,7 +13,7 @@
           id="email"
           type="email"
           formControlName="email"
-          class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          class="mt-1 w-full rounded-lg border border-white/10 bg-black px-3 py-2 text-white outline-none focus:border-emerald-500"
           placeholder="tu@email.com"
         />
       </div>
@@ -21,7 +24,7 @@
           id="password"
           type="password"
           formControlName="password"
-          class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white outline-none focus:border-emerald-500"
+          class="mt-1 w-full rounded-lg border border-white/10 bg-black px-3 py-2 text-white outline-none focus:border-emerald-500"
           placeholder="••••••••"
         />
       </div>
@@ -33,7 +36,7 @@
       <button
         type="submit"
         [disabled]="loading()"
-        class="w-full rounded-lg bg-emerald-500 px-4 py-2 font-medium text-slate-950 transition hover:bg-emerald-400 disabled:opacity-50"
+        class="w-full rounded-lg bg-emerald-500 px-4 py-2 font-medium text-black shadow-[0_0_25px_-5px_rgba(16,185,129,0.7)] transition hover:bg-emerald-400 disabled:opacity-50"
       >
         {{ loading() ? 'Entrando…' : 'Entrar' }}
       </button>

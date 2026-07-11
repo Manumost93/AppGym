@@ -40,6 +40,10 @@ Plataforma SaaS multi-negocio para gestionar gimnasios, boxes de crossfit y club
 - **CI/CD**: GitHub Actions compila y testea backend+frontend en cada push; en `main` ademas construye y publica las 5 imagenes del backend en GHCR (`ghcr.io/<usuario>/appgym-*`), listas para desplegar sin compilar nada en el servidor de produccion.
 - **Despliegue**: backend en VPS barato (Hetzner) con `docker-compose.prod.yml` + Traefik (Let's Encrypt automatico, solo `api-gateway` es publico; ver `docs/deployment.md`). Sin dominio propio, se usa `nip.io` como DNS gratuito apuntando a la IP del VPS, con HTTPS real igualmente. Frontend Angular en Vercel. Se prefirio a un PaaS tipo Render por coste y porque demuestra mejor el dominio de Docker/orquestacion.
 
+## Alta de socios y aprobacion
+
+Los socios (`MEMBER`) que se registran publicamente desde la landing (eligiendo una de las 3 disciplinas) quedan en estado `PENDING` dentro de `auth-service` (columna `status` en `users`, con `ACTIVE`/`REJECTED` como resto de valores) y no reciben tokens hasta ser aceptados. El `BUSINESS_ADMIN` del negocio correspondiente gestiona sus propios socios (aceptar, rechazar, marcar pagado/no pagado, eliminar) desde `/api/auth/clients`, con el mismo patron de cabeceras de confianza (`X-Role`/`X-Business-Id`) que el resto de endpoints administrativos. Se eligio que cada administrador de negocio gestione solo a sus propios clientes (no un SUPER_ADMIN centralizado) porque encaja con el modelo multi-tenant ya existente, y que el estado de pago sea un simple booleano marcado a mano (sin pasarela de pago real) para mantener el alcance del MVP.
+
 ## IA (`ai-service`)
 
 - Modelo configurable por endpoint via variables de entorno: `claude-haiku-4-5` para `/chat` (demo publica, coste bajo), `claude-sonnet-5` para `/recommend` e `/insights` (mas razonamiento, salida estructurada). Subible a `claude-opus-4-8` cambiando una variable de entorno si se desea maxima calidad.

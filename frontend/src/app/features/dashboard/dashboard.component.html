@@ -44,6 +44,12 @@
             >
               Mi negocio
             </a>
+            <a
+              routerLink="/clients"
+              class="rounded-lg border border-emerald-600 px-4 py-2 text-sm font-medium text-emerald-400 hover:bg-emerald-500/10"
+            >
+              Gestión de clientes
+            </a>
           }
           @if (user()!.role === 'BUSINESS_ADMIN' || user()!.role === 'STAFF') {
             <a
