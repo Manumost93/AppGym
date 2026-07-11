@@ -55,6 +55,12 @@ jobs:
         service: [api-gateway, auth-service, business-service, booking-service, ai-service]
     steps:
       - uses: actions/checkout@v4
+      # QEMU permite a buildx construir para arquitecturas distintas a la del
+      # runner (arm64, para VPS ARM gratuitos como Oracle Cloud). El Dockerfile
+      # esta preparado para no necesitarlo en el paso pesado (la compilacion
+      # de Java se hace nativa en amd64), pero lo registramos igualmente por
+      # si el paso final de la imagen runtime lo necesitara.
+      - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
@@ -71,6 +77,7 @@ jobs:
           build-args: |
             SERVICE=${{ matrix.service }}
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: |
             ghcr.io/${{ env.IMAGE_NAMESPACE }}/appgym-${{ matrix.service }}:latest
             ghcr.io/${{ env.IMAGE_NAMESPACE }}/appgym-${{ matrix.service }}:${{ github.sha }}

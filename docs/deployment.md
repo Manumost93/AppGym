@@ -4,17 +4,26 @@ Guía paso a paso para desplegar el backend de AppGym en un VPS con Docker Compo
 
 ## 0. Qué vas a necesitar
 
-- Un VPS con Docker (recomendado: [Hetzner Cloud](https://www.hetzner.com/cloud) CX22, 2 vCPU / 4GB RAM, ~4.5€/mes; DigitalOcean o cualquier otro proveedor funciona igual).
+- Un VPS con Docker. Dos opciones:
+  - **De pago** (más simple de conseguir): [Hetzner Cloud](https://www.hetzner.com/cloud) CX22, 2 vCPU / 4GB RAM, ~4.5€/mes; DigitalOcean o cualquier otro proveedor funciona igual.
+  - **Gratis para siempre**: [Oracle Cloud Free Tier](https://www.oracle.com/cloud/free/), instancia ARM Ampere A1 (hasta 4 OCPU / 24GB RAM incluidos gratis, de sobra para este stack). Pide tarjeta para verificar la cuenta (no cobra) y a veces tarda en aprobar cuentas nuevas o hay falta de capacidad en algunas regiones — si falla, prueba otra región. Al ser ARM (no x86), las imágenes Docker del CI ya se publican multi-arquitectura (`linux/amd64` + `linux/arm64`) para que `docker compose pull` funcione igual en ambas.
 - Un dominio propio apuntando a la IP del VPS, **o** usar [nip.io](https://nip.io) (gratis, sin registro) mientras tanto — ver paso 4.
 - Tu `ANTHROPIC_API_KEY`.
 - El repo ya tiene el CI configurado para publicar imágenes en GHCR (`ghcr.io/<tu-usuario>/appgym-*`) en cada push a `main` — no hace falta hacer nada extra para esto, ya está en `.github/workflows/ci.yml`.
 
 ## 1. Contratar el VPS
 
-1. Crea una cuenta en Hetzner Cloud (u otro proveedor).
+**Con Hetzner (u otro proveedor de pago):**
+1. Crea una cuenta en Hetzner Cloud.
 2. Crea un servidor: imagen **Ubuntu 24.04**, tamaño **CX22** (o el equivalente más barato con al menos 4GB de RAM — 5 microservicios Java + Postgres necesitan margen).
 3. Añade tu clave SSH pública al crear el servidor (más simple y seguro que contraseña).
 4. Anota la IP pública del servidor.
+
+**Con Oracle Cloud Free Tier:**
+1. Crea una cuenta en [oracle.com/cloud/free](https://www.oracle.com/cloud/free/) (pide tarjeta solo para verificar identidad).
+2. Crea una instancia: **Compute** → **Create instance** → imagen **Ubuntu 24.04**, forma **VM.Standard.A1.Flex** (Ampere/ARM), con 2-4 OCPU y 8-24GB de RAM (dentro del tier gratuito).
+3. Añade tu clave SSH pública al crear la instancia.
+4. Anota la IP pública. En **Networking** → **Virtual Cloud Network** → **Security Lists**, abre los puertos 80 y 443 (por defecto Oracle solo deja abierto el 22 de SSH).
 
 ## 2. Preparar el servidor
 
