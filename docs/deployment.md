@@ -24,6 +24,7 @@ Guía paso a paso para desplegar el backend de AppGym en un VPS con Docker Compo
 2. Crea una instancia: **Compute** → **Create instance** → imagen **Ubuntu 24.04**, forma **VM.Standard.A1.Flex** (Ampere/ARM), con 2-4 OCPU y 8-24GB de RAM (dentro del tier gratuito).
 3. Añade tu clave SSH pública al crear la instancia.
 4. Anota la IP pública. En **Networking** → **Virtual Cloud Network** → **Security Lists**, abre los puertos 80 y 443 (por defecto Oracle solo deja abierto el 22 de SSH).
+5. La imagen Ubuntu de Oracle trae ademas su **propio firewall interno** (`iptables`/Netfilter) que bloquea el trafico entrante aunque el paso anterior ya lo permita a nivel de red — hay que abrirlo tambien dentro de la instancia (ver paso 2, se hace con `ufw`, pero en Oracle especificamente tambien hace falta persistir las reglas de `iptables`; ver nota en el paso 2).
 
 ## 2. Preparar el servidor
 
@@ -40,6 +41,14 @@ ufw allow OpenSSH
 ufw allow 80/tcp
 ufw allow 443/tcp
 ufw --force enable
+```
+
+**Solo si usas Oracle Cloud**: las imagenes Ubuntu de Oracle traen unas reglas de `iptables` propias que bloquean el trafico entrante por delante de `ufw`, aunque hayas abierto los puertos en la Security List. Hay que vaciarlas (o insertar reglas de aceptacion para 80/443) y guardarlas para que sobrevivan a un reinicio:
+
+```bash
+iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+iptables -I INPUT -p tcp --dport 443 -j ACCEPT
+netfilter-persistent save
 ```
 
 ## 3. Hacer públicos los paquetes de GHCR (una sola vez)
