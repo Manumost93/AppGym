@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-slate-950">
+<div class="bg-grid min-h-screen bg-black">
   @if (hero(); as h) {
     <div class="relative isolate overflow-hidden">
       <img [src]="h.image" alt="" class="absolute inset-0 h-full w-full object-cover opacity-30" />
@@ -9,7 +9,7 @@
             <p class="text-xs font-semibold uppercase tracking-widest text-emerald-400">
               {{ business()?.name }}
             </p>
-            <h1 class="mt-1 text-2xl font-semibold text-white">{{ h.heading }}</h1>
+            <h1 class="font-display mt-1 text-2xl font-extrabold text-white">{{ h.heading }}</h1>
             <p class="mt-1 text-sm text-slate-300">{{ h.subheading }}</p>
           </div>
           <a routerLink="/dashboard" class="text-sm text-slate-400 hover:text-white">← Volver</a>
@@ -21,7 +21,7 @@
   <div class="mx-auto max-w-3xl px-4 py-10">
     @if (!hero()) {
       <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-semibold text-white">Reservar clases y pistas</h1>
+        <h1 class="font-display text-2xl font-extrabold text-white">Reservar clases y pistas</h1>
         <a routerLink="/dashboard" class="text-sm text-slate-400 hover:text-white">← Volver</a>
       </div>
     }
@@ -31,7 +31,7 @@
     }
 
     @if (recommendation(); as rec) {
-      <div class="mt-8 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-slate-900 p-6 ring-1 ring-emerald-800/50">
+      <div class="mt-8 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-slate-900 p-6 border border-emerald-500/15">
         <p class="text-xs font-medium uppercase tracking-wide text-emerald-400">Recomendado para ti</p>
         <p class="mt-2 text-white">{{ rec.headline }}</p>
         @if (rec.suggestions.length > 0) {
@@ -44,7 +44,7 @@
       </div>
     }
 
-    <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
+    <div class="mt-8 rounded-2xl bg-zinc-950/60 p-6 border border-white/10">
       <h2 class="text-lg font-medium text-white">{{ hero()?.slotsTitle ?? 'Próximas franjas horarias' }}</h2>
       @if (loading()) {
         <p class="mt-4 text-slate-400">Cargando…</p>
@@ -53,7 +53,7 @@
       } @else {
         <div class="mt-4 space-y-3">
           @for (slot of slots(); track slot.id) {
-            <div class="flex items-center justify-between rounded-lg border border-slate-800 p-4">
+            <div class="flex items-center justify-between rounded-lg border border-white/10 p-4">
               <div>
                 <p class="font-medium text-white">{{ slot.activityName }}</p>
                 <p class="text-sm text-slate-400">
@@ -73,7 +73,7 @@
                 <button
                   (click)="book(slot)"
                   [disabled]="bookingSlotId() === slot.id"
-                  class="rounded-lg bg-emerald-500 px-3 py-1.5 text-sm font-medium text-slate-950 hover:bg-emerald-400 disabled:opacity-50"
+                  class="rounded-lg bg-emerald-500 px-3 py-1.5 text-sm font-medium text-black shadow-[0_0_25px_-5px_rgba(16,185,129,0.7)] hover:bg-emerald-400 disabled:opacity-50"
                 >
                   {{ slot.full ? 'Unirse a la lista de espera' : 'Reservar' }}
                 </button>
@@ -84,14 +84,14 @@
       }
     </div>
 
-    <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
+    <div class="mt-8 rounded-2xl bg-zinc-950/60 p-6 border border-white/10">
       <h2 class="text-lg font-medium text-white">Mis reservas</h2>
       @if (myBookings().length === 0) {
         <p class="mt-4 text-slate-400">Todavía no tienes reservas.</p>
       } @else {
         <div class="mt-4 space-y-2">
           @for (booking of myBookings(); track booking.id) {
-            <div class="flex items-center justify-between rounded-lg border border-slate-800 p-3 text-sm">
+            <div class="flex items-center justify-between rounded-lg border border-white/10 p-3 text-sm">
               <div>
                 <p class="text-white">{{ booking.activityName }}</p>
                 @if (booking.slotStartTime) {
@@ -105,7 +105,7 @@
                   [class.text-emerald-400]="booking.status === 'CONFIRMED'"
                   [class.bg-amber-500/10]="booking.status === 'WAITLIST'"
                   [class.text-amber-400]="booking.status === 'WAITLIST'"
-                  [class.bg-slate-800]="booking.status === 'CANCELLED'"
+                  [class.bg-white/5]="booking.status === 'CANCELLED'"
                   [class.text-slate-500]="booking.status === 'CANCELLED'"
                 >
                   {{ booking.status }}

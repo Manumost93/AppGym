@@ -1,16 +1,16 @@
-<div class="min-h-screen bg-slate-950 px-4 py-10">
+<div class="bg-grid min-h-screen bg-black px-4 py-10">
   <div class="mx-auto max-w-2xl">
     <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-semibold text-white">AppGym</h1>
+      <h1 class="font-display text-2xl font-extrabold text-white">AppGym</h1>
       <button
         (click)="logout()"
-        class="rounded-lg border border-slate-700 px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-800"
+        class="rounded-lg border border-white/10 px-3 py-1.5 text-sm text-slate-300 hover:bg-white/5"
       >
         Cerrar sesión
       </button>
     </div>
 
-    <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
+    <div class="mt-8 rounded-2xl bg-zinc-950/60 p-6 border border-white/10">
       @if (loading()) {
         <p class="text-slate-400">Verificando sesión a través del gateway…</p>
       } @else if (errorMessage()) {
@@ -32,7 +32,7 @@
           @if (user()!.role === 'SUPER_ADMIN') {
             <a
               routerLink="/businesses"
-              class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-400"
+              class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-black shadow-[0_0_25px_-5px_rgba(16,185,129,0.7)] hover:bg-emerald-400"
             >
               Gestionar negocios
             </a>
@@ -40,7 +40,7 @@
           @if (user()!.role === 'BUSINESS_ADMIN') {
             <a
               routerLink="/my-business"
-              class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-400"
+              class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-black shadow-[0_0_25px_-5px_rgba(16,185,129,0.7)] hover:bg-emerald-400"
             >
               Mi negocio
             </a>
@@ -62,7 +62,7 @@
           @if (user()!.role === 'MEMBER') {
             <a
               routerLink="/schedule"
-              class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-emerald-400"
+              class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-black shadow-[0_0_25px_-5px_rgba(16,185,129,0.7)] hover:bg-emerald-400"
             >
               Reservar clases y pistas
             </a>

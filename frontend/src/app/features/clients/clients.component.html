@@ -1,7 +1,7 @@
-<div class="min-h-screen bg-slate-950 px-4 py-10">
+<div class="bg-grid min-h-screen bg-black px-4 py-10">
   <div class="mx-auto max-w-3xl">
     <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-semibold text-white">Gestión de clientes</h1>
+      <h1 class="font-display text-2xl font-extrabold text-white">Gestión de clientes</h1>
       <a routerLink="/dashboard" class="text-sm text-slate-400 hover:text-white">← Volver</a>
     </div>
     <p class="mt-1 text-sm text-slate-400">
@@ -12,7 +12,7 @@
       <p class="mt-4 text-sm text-red-400">{{ errorMessage() }}</p>
     }
 
-    <div class="mt-8 rounded-2xl bg-slate-900 p-6 shadow-xl ring-1 ring-slate-800">
+    <div class="mt-8 rounded-2xl bg-zinc-950/60 p-6 border border-white/10">
       @if (loading()) {
         <p class="text-slate-400">Cargando…</p>
       } @else if (clients().length === 0) {
@@ -20,7 +20,7 @@
       } @else {
         <div class="space-y-3">
           @for (client of clients(); track client.id) {
-            <div class="rounded-lg border border-slate-800 p-4">
+            <div class="rounded-lg border border-white/10 p-4">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <p class="font-medium text-white">{{ client.fullName }}</p>
@@ -51,7 +51,7 @@
                     [class]="
                       client.paid
                         ? 'rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-400'
-                        : 'rounded-full bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-400'
+                        : 'rounded-full bg-white/5 px-2 py-0.5 text-xs font-medium text-slate-400'
                     "
                   >
                     {{ client.paid ? 'Pagado' : 'No pagado' }}
@@ -65,7 +65,7 @@
                     type="button"
                     (click)="approve(client)"
                     [disabled]="busyClientId() === client.id"
-                    class="rounded-lg bg-emerald-500 px-3 py-1.5 text-sm font-medium text-slate-950 transition hover:bg-emerald-400 disabled:opacity-50"
+                    class="rounded-lg bg-emerald-500 px-3 py-1.5 text-sm font-medium text-black shadow-[0_0_25px_-5px_rgba(16,185,129,0.7)] transition hover:bg-emerald-400 disabled:opacity-50"
                   >
                     Aceptar
                   </button>
@@ -84,7 +84,7 @@
                   type="button"
                   (click)="remove(client)"
                   [disabled]="busyClientId() === client.id"
-                  class="rounded-lg border border-slate-700 px-3 py-1.5 text-sm text-slate-400 transition hover:bg-slate-800 disabled:opacity-50"
+                  class="rounded-lg border border-white/10 px-3 py-1.5 text-sm text-slate-400 transition hover:bg-white/5 disabled:opacity-50"
                 >
                   Eliminar
                 </button>
