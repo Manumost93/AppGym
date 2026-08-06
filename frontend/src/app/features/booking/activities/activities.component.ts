@@ -22,6 +22,8 @@ export class ActivitiesComponent implements OnInit {
   readonly creatingActivity = signal(false);
   readonly creatingSlotFor = signal<string | null>(null);
   readonly errorMessage = signal<string | null>(null);
+  readonly showInactive = signal(false);
+  readonly togglingActivityId = signal<string | null>(null);
 
   readonly activityForm = this.fb.group({
     type: ['CLASS' as ActivityType, [Validators.required]],
@@ -44,13 +46,42 @@ export class ActivitiesComponent implements OnInit {
 
   reloadActivities(): void {
     this.loading.set(true);
-    this.bookingService.listActivities().subscribe({
+    this.bookingService.listActivities(this.showInactive()).subscribe({
       next: (activities) => {
         this.activities.set(activities);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
     });
+  }
+
+  toggleShowInactive(): void {
+    this.showInactive.set(!this.showInactive());
+    this.reloadActivities();
+  }
+
+  reactivate(activity: Activity): void {
+    this.togglingActivityId.set(activity.id);
+    this.bookingService
+      .updateActivity(activity.id, {
+        type: activity.type,
+        name: activity.name,
+        description: activity.description || undefined,
+        capacity: activity.capacity,
+        durationMinutes: activity.durationMinutes,
+        instructorName: activity.instructorName || undefined,
+        active: true,
+      })
+      .subscribe({
+        next: () => {
+          this.togglingActivityId.set(null);
+          this.reloadActivities();
+        },
+        error: () => {
+          this.togglingActivityId.set(null);
+          this.errorMessage.set('No se pudo reactivar la actividad.');
+        },
+      });
   }
 
   reloadSlots(): void {

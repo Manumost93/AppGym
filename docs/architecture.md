@@ -33,7 +33,7 @@ Plataforma SaaS multi-negocio para gestionar gimnasios, boxes de crossfit y club
 
 - **Sin Eureka**: con 5 servicios fijos, el DNS de docker-compose ya resuelve nombres de servicio. Anadir service discovery no aporta aprendizaje adicional a esta escala.
 - **Sin message broker**: las llamadas REST sincronas son suficientes para 5 servicios. Un evento `booking.created` a un futuro `notification-service` queda documentado como mejora futura, no como parte del MVP.
-- **Redis**: rate limiting de `/api/ai/**` en el gateway, blacklist de refresh tokens en `auth-service`, cache opcional de `/insights`.
+- **Redis**: rate limiting real de `/api/ai/**` en el gateway (`RedisRateLimiter` de Spring Cloud Gateway, 2 tokens/seg con burst de 5, por usuario autenticado via `X-User-Id`) y freno de fuerza bruta en `/api/auth/login` (5 intentos fallidos por email en una ventana de 15 min, tanto si el email no existe como si la contrasena es incorrecta, para no dar pistas sobre que emails estan registrados). La revocacion de refresh tokens sigue viviendo en Postgres (no Redis): son de un solo uso, se rotan en cada `/refresh`, y su durabilidad importa mas que la velocidad.
 - **Postgres**: un unico proceso con una base de datos y un usuario propio por servicio (database-per-service logico). En produccion vive dentro del propio VPS (mismo docker-compose.prod.yml) para simplificar el primer despliegue; migrar a un Postgres gestionado (Supabase u otro) mas adelante es solo un cambio de variables de entorno (`DB_HOST`/`DB_USER`/`DB_PASSWORD`), sin tocar codigo.
 - **JWT HS256**: secreto compartido entre `api-gateway` y `auth-service`. RS256 queda documentado como mejora futura (rotacion de claves sin compartir secreto).
 - **Testing**: JUnit5+Mockito en todos los servicios; Testcontainers solo en `booking-service` (el mas representativo por reservas/capacidad/transacciones).
@@ -43,6 +43,14 @@ Plataforma SaaS multi-negocio para gestionar gimnasios, boxes de crossfit y club
 ## Alta de socios y aprobacion
 
 Los socios (`MEMBER`) que se registran publicamente desde la landing (eligiendo una de las 3 disciplinas) quedan en estado `PENDING` dentro de `auth-service` (columna `status` en `users`, con `ACTIVE`/`REJECTED` como resto de valores) y no reciben tokens hasta ser aceptados. El `BUSINESS_ADMIN` del negocio correspondiente gestiona sus propios socios (aceptar, rechazar, marcar pagado/no pagado, eliminar) desde `/api/auth/clients`, con el mismo patron de cabeceras de confianza (`X-Role`/`X-Business-Id`) que el resto de endpoints administrativos. Se eligio que cada administrador de negocio gestione solo a sus propios clientes (no un SUPER_ADMIN centralizado) porque encaja con el modelo multi-tenant ya existente, y que el estado de pago sea un simple booleano marcado a mano (sin pasarela de pago real) para mantener el alcance del MVP.
+
+## Gestion de cuenta y de negocio
+
+- `POST /api/auth/logout` revoca el refresh token en el servidor (endpoint publico, para poder invalidar la sesion aunque el access token ya haya caducado); antes, "cerrar sesion" solo borraba el token en el navegador y el refresh token seguia siendo valido hasta su próxima rotacion o caducidad natural.
+- `PATCH /api/auth/me/password` permite a cualquier usuario cambiar su contrasena (requiere la actual).
+- `PUT /api/business/me` permite al `BUSINESS_ADMIN` editar el perfil de su propio negocio (nombre, descripcion, contacto, color de marca) despues de creado — antes solo lo fijaba el `SUPER_ADMIN` una vez, al crearlo, sin posibilidad de cambiarlo. El tipo de negocio (`GYM`/`CROSSFIT_BOX`/`PADEL_CLUB`) no es editable: cambiarlo despues de tener actividades y planes asociados no tiene sentido de negocio.
+- `PATCH /api/business/{id}/status` permite al `SUPER_ADMIN` activar/desactivar cualquier negocio de la plataforma (el campo `active` ya existia en el modelo de datos pero no habia forma de usarlo).
+- Las actividades desactivadas (`DELETE /api/booking/activities/{id}`) se pueden reactivar de nuevo con el mismo `PUT` de edicion (campo `active` opcional en el body); `GET /api/booking/activities?includeInactive=true` (solo BUSINESS_ADMIN/STAFF) las lista para poder encontrarlas y reactivarlas.
 
 ## IA (`ai-service`)
 

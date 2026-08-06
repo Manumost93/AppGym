@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { UserResponse } from '../../core/auth/auth.models';
@@ -7,13 +8,25 @@ import { UserResponse } from '../../core/auth/auth.models';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent implements OnInit {
+  private readonly fb = inject(FormBuilder);
+
   readonly user = signal<UserResponse | null>(null);
   readonly loading = signal(true);
   readonly errorMessage = signal<string | null>(null);
+
+  readonly showPasswordForm = signal(false);
+  readonly changingPassword = signal(false);
+  readonly passwordError = signal<string | null>(null);
+  readonly passwordSuccess = signal(false);
+
+  readonly passwordForm = this.fb.group({
+    currentPassword: ['', [Validators.required]],
+    newPassword: ['', [Validators.required, Validators.minLength(8)]],
+  });
 
   constructor(
     private readonly authService: AuthService,
@@ -33,6 +46,41 @@ export class DashboardComponent implements OnInit {
         this.errorMessage.set('No se pudo verificar la sesión.');
       },
     });
+  }
+
+  togglePasswordForm(): void {
+    this.showPasswordForm.set(!this.showPasswordForm());
+    this.passwordError.set(null);
+    this.passwordSuccess.set(false);
+    this.passwordForm.reset();
+  }
+
+  submitPasswordChange(): void {
+    if (this.passwordForm.invalid) {
+      this.passwordForm.markAllAsTouched();
+      return;
+    }
+
+    this.changingPassword.set(true);
+    this.passwordError.set(null);
+    this.passwordSuccess.set(false);
+
+    this.authService
+      .changePassword({
+        currentPassword: this.passwordForm.value.currentPassword!,
+        newPassword: this.passwordForm.value.newPassword!,
+      })
+      .subscribe({
+        next: () => {
+          this.changingPassword.set(false);
+          this.passwordSuccess.set(true);
+          this.passwordForm.reset();
+        },
+        error: (err) => {
+          this.changingPassword.set(false);
+          this.passwordError.set(err.error?.message ?? 'No se pudo cambiar la contraseña.');
+        },
+      });
   }
 
   logout(): void {

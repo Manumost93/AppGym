@@ -81,14 +81,33 @@
         <div class="mt-4 space-y-3">
           @for (business of businesses(); track business.id) {
             <div class="rounded-lg border border-white/10 p-4">
-              <div class="flex items-center justify-between">
+              <div class="flex items-center justify-between gap-2">
                 <p class="font-medium text-white">{{ business.name }}</p>
-                <span class="rounded-full bg-white/5 px-2 py-0.5 text-xs text-slate-400">{{ business.type }}</span>
+                <div class="flex items-center gap-2">
+                  <span class="rounded-full bg-white/5 px-2 py-0.5 text-xs text-slate-400">{{ business.type }}</span>
+                  <span
+                    class="rounded-full px-2 py-0.5 text-xs font-medium"
+                    [class.bg-emerald-500/10]="business.active"
+                    [class.text-emerald-400]="business.active"
+                    [class.bg-red-500/10]="!business.active"
+                    [class.text-red-400]="!business.active"
+                  >
+                    {{ business.active ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </div>
               </div>
               <p class="mt-1 text-xs text-slate-500">
                 ID (para dar de alta al BUSINESS_ADMIN):
                 <code class="text-emerald-400">{{ business.id }}</code>
               </p>
+              <button
+                type="button"
+                (click)="toggleStatus(business)"
+                [disabled]="togglingId() === business.id"
+                class="mt-3 rounded-lg border border-white/10 px-3 py-1.5 text-xs text-slate-300 hover:bg-white/5 disabled:opacity-50"
+              >
+                {{ business.active ? 'Desactivar' : 'Activar' }}
+              </button>
             </div>
           }
         </div>

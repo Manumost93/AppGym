@@ -57,7 +57,7 @@ class BookingFlowIntegrationTest {
         UUID businessId = UUID.randomUUID();
 
         ActivityResponse activity = activityService.create(businessId,
-                new ActivityRequest(ActivityType.CLASS, "WOD del dia", "Entrenamiento funcional", 1, 60, "Coach Ana"));
+                new ActivityRequest(ActivityType.CLASS, "WOD del dia", "Entrenamiento funcional", 1, 60, "Coach Ana", null));
 
         ScheduleSlotResponse slot = slotService.create(businessId,
                 new ScheduleSlotRequest(activity.id(), Instant.now().plusSeconds(3600), null));

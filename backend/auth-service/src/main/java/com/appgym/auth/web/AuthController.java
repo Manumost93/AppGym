@@ -3,7 +3,9 @@ package com.appgym.auth.web;
 import com.appgym.auth.repository.UserRepository;
 import com.appgym.auth.service.AuthService;
 import com.appgym.auth.web.dto.AuthResponse;
+import com.appgym.auth.web.dto.ChangePasswordRequest;
 import com.appgym.auth.web.dto.LoginRequest;
+import com.appgym.auth.web.dto.LogoutRequest;
 import com.appgym.auth.web.dto.RefreshRequest;
 import com.appgym.auth.web.dto.RegisterRequest;
 import com.appgym.auth.web.dto.UpdateClientRequest;
@@ -52,6 +54,24 @@ public class AuthController {
     @PostMapping("/refresh")
     public AuthResponse refresh(@Valid @RequestBody RefreshRequest request) {
         return authService.refresh(request.refreshToken());
+    }
+
+    /**
+     * Publico (no requiere JWT valido): el objetivo es invalidar el refresh
+     * token del lado del servidor aunque el access token ya haya caducado.
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@Valid @RequestBody LogoutRequest request) {
+        authService.logout(request.refreshToken());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/me/password")
+    public ResponseEntity<Void> changePassword(
+            @RequestHeader(JwtClaims.HEADER_USER_ID) UUID userId,
+            @Valid @RequestBody ChangePasswordRequest request) {
+        authService.changePassword(userId, request);
+        return ResponseEntity.noContent().build();
     }
 
     /**

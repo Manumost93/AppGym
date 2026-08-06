@@ -10,5 +10,7 @@ public interface ActivityRepository extends JpaRepository<Activity, UUID> {
 
     List<Activity> findByBusinessIdAndActiveTrueOrderByNameAsc(UUID businessId);
 
+    List<Activity> findByBusinessIdOrderByNameAsc(UUID businessId);
+
     Optional<Activity> findByIdAndBusinessId(UUID id, UUID businessId);
 }

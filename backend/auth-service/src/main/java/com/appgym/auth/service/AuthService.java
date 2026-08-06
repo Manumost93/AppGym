@@ -4,6 +4,7 @@ import com.appgym.auth.domain.User;
 import com.appgym.auth.domain.UserStatus;
 import com.appgym.auth.repository.UserRepository;
 import com.appgym.auth.web.dto.AuthResponse;
+import com.appgym.auth.web.dto.ChangePasswordRequest;
 import com.appgym.auth.web.dto.LoginRequest;
 import com.appgym.auth.web.dto.RegisterRequest;
 import com.appgym.auth.web.dto.UpdateClientRequest;
@@ -24,13 +25,16 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+    private final LoginAttemptService loginAttemptService;
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                        JwtService jwtService, RefreshTokenService refreshTokenService) {
+                        JwtService jwtService, RefreshTokenService refreshTokenService,
+                        LoginAttemptService loginAttemptService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
+        this.loginAttemptService = loginAttemptService;
     }
 
     /**
@@ -72,13 +76,21 @@ public class AuthService {
 
     @Transactional
     public AuthResponse login(LoginRequest request) {
+        loginAttemptService.checkNotBlocked(request.email());
+
         User user = userRepository.findByEmail(request.email())
                 .filter(User::isEnabled)
-                .orElseThrow(() -> new BadCredentialsException("Credenciales invalidas"));
+                .orElseGet(() -> {
+                    loginAttemptService.recordFailure(request.email());
+                    throw new BadCredentialsException("Credenciales invalidas");
+                });
 
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+            loginAttemptService.recordFailure(request.email());
             throw new BadCredentialsException("Credenciales invalidas");
         }
+
+        loginAttemptService.recordSuccess(request.email());
 
         if (user.getStatus() == UserStatus.PENDING) {
             throw new AccountNotActiveException("ACCOUNT_PENDING",
@@ -100,6 +112,28 @@ public class AuthService {
                 .orElseThrow(() -> new RefreshTokenService.InvalidRefreshTokenException("Usuario no encontrado"));
 
         return buildAuthResponse(user);
+    }
+
+    /**
+     * Revoca el refresh token entregado. Siempre "tiene exito" desde el punto
+     * de vista del cliente (no lanza error con un token ya caducado/invalido),
+     * ya que el objetivo de logout es simplemente que ese token deje de servir.
+     */
+    @Transactional
+    public void logout(String rawRefreshToken) {
+        refreshTokenService.revokeIfPresent(rawRefreshToken);
+    }
+
+    @Transactional
+    public void changePassword(UUID userId, ChangePasswordRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado"));
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+            throw new BadCredentialsException("La contrasena actual no es correcta");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
     }
 
     /** Clientes (MEMBER) del negocio del BUSINESS_ADMIN que hace la peticion. */

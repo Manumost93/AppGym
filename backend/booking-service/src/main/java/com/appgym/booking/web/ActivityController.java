@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -43,8 +44,13 @@ public class ActivityController {
 
     @GetMapping
     public List<ActivityResponse> list(
-            @RequestHeader(value = JwtClaims.HEADER_BUSINESS_ID, required = false) UUID businessId) {
-        return activityService.listActive(AccessControl.requireBusinessId(businessId));
+            @RequestHeader(value = JwtClaims.HEADER_BUSINESS_ID, required = false) UUID businessId,
+            @RequestHeader(value = JwtClaims.HEADER_ROLE, required = false) String role,
+            @RequestParam(value = "includeInactive", defaultValue = "false") boolean includeInactive) {
+        UUID ownBusinessId = AccessControl.requireBusinessId(businessId);
+        boolean canSeeInactive = includeInactive
+                && (Role.BUSINESS_ADMIN.name().equals(role) || Role.STAFF.name().equals(role));
+        return canSeeInactive ? activityService.listAll(ownBusinessId) : activityService.listActive(ownBusinessId);
     }
 
     @PutMapping("/{id}")

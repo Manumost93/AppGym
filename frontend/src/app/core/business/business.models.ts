@@ -22,6 +22,15 @@ export interface CreateBusinessRequest {
   primaryColor?: string;
 }
 
+export interface UpdateBusinessRequest {
+  name: string;
+  description?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  address?: string;
+  primaryColor?: string;
+}
+
 export interface MembershipPlan {
   id: string;
   businessId: string;

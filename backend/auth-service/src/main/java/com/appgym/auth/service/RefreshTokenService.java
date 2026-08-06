@@ -54,6 +54,21 @@ public class RefreshTokenService {
         return token.getUserId();
     }
 
+    /**
+     * Revoca el refresh token si existe y sigue siendo valido; no hace nada
+     * (ni lanza error) si no se encuentra, para que /logout siempre "tenga
+     * exito" desde el punto de vista del cliente, incluso con un token ya
+     * caducado o reutilizado.
+     */
+    public void revokeIfPresent(String rawToken) {
+        repository.findByTokenHash(hash(rawToken))
+                .filter(RefreshToken::isValid)
+                .ifPresent(token -> {
+                    token.revoke();
+                    repository.save(token);
+                });
+    }
+
     private String hash(String value) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

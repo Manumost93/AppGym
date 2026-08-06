@@ -7,6 +7,7 @@ import {
   CreateBusinessRequest,
   MembershipPlan,
   MembershipPlanRequest,
+  UpdateBusinessRequest,
 } from './business.models';
 
 @Injectable({ providedIn: 'root' })
@@ -24,6 +25,14 @@ export class BusinessService {
 
   getMyBusiness(): Observable<Business> {
     return this.http.get<Business>(`${this.baseUrl}/me`);
+  }
+
+  updateMyBusiness(request: UpdateBusinessRequest): Observable<Business> {
+    return this.http.put<Business>(`${this.baseUrl}/me`, request);
+  }
+
+  updateStatus(businessId: string, active: boolean): Observable<Business> {
+    return this.http.patch<Business>(`${this.baseUrl}/${businessId}/status`, { active });
   }
 
   listPlans(): Observable<MembershipPlan[]> {

@@ -4,6 +4,7 @@ import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   AuthResponse,
+  ChangePasswordRequest,
   LoginRequest,
   RegisterRequest,
   UpdateClientRequest,
@@ -66,10 +67,20 @@ export class AuthService {
   }
 
   logout(): void {
+    const refreshToken = this.getRefreshToken();
+    if (refreshToken) {
+      // Revocacion best-effort en el servidor: si falla (sin red, token ya
+      // caducado...) el cliente cierra sesion igualmente.
+      this.http.post(`${environment.apiUrl}/auth/logout`, { refreshToken }).subscribe({ error: () => {} });
+    }
     localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     this.currentUserSignal.set(null);
+  }
+
+  changePassword(request: ChangePasswordRequest): Observable<void> {
+    return this.http.patch<void>(`${environment.apiUrl}/auth/me/password`, request);
   }
 
   getAccessToken(): string | null {

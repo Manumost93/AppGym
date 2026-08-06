@@ -75,7 +75,13 @@
     </div>
 
     <div class="mt-8 rounded-2xl bg-zinc-950/60 p-6 border border-white/10">
-      <h2 class="text-lg font-medium text-white">Actividades</h2>
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-medium text-white">Actividades</h2>
+        <label class="flex items-center gap-2 text-xs text-slate-400">
+          <input type="checkbox" [checked]="showInactive()" (change)="toggleShowInactive()" />
+          Ver desactivadas
+        </label>
+      </div>
       @if (loading()) {
         <p class="mt-4 text-slate-400">Cargando…</p>
       } @else if (activities().length === 0) {
@@ -83,10 +89,15 @@
       } @else {
         <div class="mt-4 space-y-3">
           @for (activity of activities(); track activity.id) {
-            <div class="rounded-lg border border-white/10 p-4">
+            <div class="rounded-lg border border-white/10 p-4" [class.opacity-50]="!activity.active">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="font-medium text-white">{{ activity.name }}</p>
+                  <p class="font-medium text-white">
+                    {{ activity.name }}
+                    @if (!activity.active) {
+                      <span class="ml-2 rounded-full bg-white/5 px-2 py-0.5 text-xs text-slate-400">Desactivada</span>
+                    }
+                  </p>
                   <p class="text-xs text-slate-500">
                     {{ activity.type === 'CLASS' ? 'Clase' : 'Pista' }} · cupo {{ activity.capacity }} ·
                     {{ activity.durationMinutes }} min
@@ -96,15 +107,25 @@
                   </p>
                 </div>
                 <div class="flex gap-2">
-                  <button
-                    (click)="startSlotFor(activity.id)"
-                    class="text-sm text-emerald-400 hover:text-emerald-300"
-                  >
-                    + Franja horaria
-                  </button>
-                  <button (click)="deactivate(activity)" class="text-sm text-red-400 hover:text-red-300">
-                    Desactivar
-                  </button>
+                  @if (activity.active) {
+                    <button
+                      (click)="startSlotFor(activity.id)"
+                      class="text-sm text-emerald-400 hover:text-emerald-300"
+                    >
+                      + Franja horaria
+                    </button>
+                    <button (click)="deactivate(activity)" class="text-sm text-red-400 hover:text-red-300">
+                      Desactivar
+                    </button>
+                  } @else {
+                    <button
+                      (click)="reactivate(activity)"
+                      [disabled]="togglingActivityId() === activity.id"
+                      class="text-sm text-emerald-400 hover:text-emerald-300 disabled:opacity-50"
+                    >
+                      Reactivar
+                    </button>
+                  }
                 </div>
               </div>
 

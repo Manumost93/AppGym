@@ -20,6 +20,7 @@ export interface ActivityRequest {
   capacity: number;
   durationMinutes: number;
   instructorName?: string;
+  active?: boolean;
 }
 
 export interface ScheduleSlot {

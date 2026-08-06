@@ -19,6 +19,7 @@ export class BusinessesListComponent implements OnInit {
   readonly loading = signal(true);
   readonly creating = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly togglingId = signal<string | null>(null);
   readonly types: BusinessType[] = ['GYM', 'CROSSFIT_BOX', 'PADEL_CLUB'];
 
   readonly form = this.fb.group({
@@ -74,5 +75,19 @@ export class BusinessesListComponent implements OnInit {
           this.errorMessage.set('No se pudo crear el negocio.');
         },
       });
+  }
+
+  toggleStatus(business: Business): void {
+    this.togglingId.set(business.id);
+    this.businessService.updateStatus(business.id, !business.active).subscribe({
+      next: () => {
+        this.togglingId.set(null);
+        this.reload();
+      },
+      error: () => {
+        this.togglingId.set(null);
+        this.errorMessage.set('No se pudo cambiar el estado del negocio.');
+      },
+    });
   }
 }

@@ -30,6 +30,11 @@ export class MyBusinessComponent implements OnInit {
   readonly insights = signal<InsightsResponse | null>(null);
   readonly loadingInsights = signal(false);
 
+  readonly savingBusiness = signal(false);
+  readonly businessError = signal<string | null>(null);
+  readonly businessSaved = signal(false);
+  readonly showBusinessForm = signal(false);
+
   readonly businessId = this.authService.currentUser()?.businessId ?? null;
 
   readonly form = this.fb.group({
@@ -40,10 +45,67 @@ export class MyBusinessComponent implements OnInit {
     durationDays: [30, [Validators.required, Validators.min(1)]],
   });
 
+  readonly businessForm = this.fb.group({
+    name: ['', [Validators.required]],
+    description: [''],
+    contactEmail: [''],
+    contactPhone: [''],
+    address: [''],
+    primaryColor: ['#10b981'],
+  });
+
   ngOnInit(): void {
-    this.businessService.getMyBusiness().subscribe((business) => this.business.set(business));
+    this.businessService.getMyBusiness().subscribe((business) => {
+      this.business.set(business);
+      this.businessForm.setValue({
+        name: business.name,
+        description: business.description ?? '',
+        contactEmail: business.contactEmail ?? '',
+        contactPhone: business.contactPhone ?? '',
+        address: business.address ?? '',
+        primaryColor: business.primaryColor ?? '#10b981',
+      });
+    });
     this.reloadPlans();
     this.loadInsights();
+  }
+
+  toggleBusinessForm(): void {
+    this.showBusinessForm.set(!this.showBusinessForm());
+    this.businessError.set(null);
+    this.businessSaved.set(false);
+  }
+
+  submitBusiness(): void {
+    if (this.businessForm.invalid) {
+      this.businessForm.markAllAsTouched();
+      return;
+    }
+
+    this.savingBusiness.set(true);
+    this.businessError.set(null);
+    this.businessSaved.set(false);
+
+    this.businessService
+      .updateMyBusiness({
+        name: this.businessForm.value.name!,
+        description: this.businessForm.value.description || undefined,
+        contactEmail: this.businessForm.value.contactEmail || undefined,
+        contactPhone: this.businessForm.value.contactPhone || undefined,
+        address: this.businessForm.value.address || undefined,
+        primaryColor: this.businessForm.value.primaryColor || undefined,
+      })
+      .subscribe({
+        next: (business) => {
+          this.business.set(business);
+          this.savingBusiness.set(false);
+          this.businessSaved.set(true);
+        },
+        error: () => {
+          this.savingBusiness.set(false);
+          this.businessError.set('No se pudo guardar el negocio.');
+        },
+      });
   }
 
   loadInsights(): void {

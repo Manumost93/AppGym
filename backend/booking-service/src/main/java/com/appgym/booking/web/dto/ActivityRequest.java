@@ -11,6 +11,8 @@ public record ActivityRequest(
         String description,
         @NotNull @Positive Integer capacity,
         @NotNull @Positive Integer durationMinutes,
-        String instructorName
+        String instructorName,
+        /** Solo se tiene en cuenta al actualizar (permite reactivar una actividad desactivada); se ignora al crear. */
+        Boolean active
 ) {
 }

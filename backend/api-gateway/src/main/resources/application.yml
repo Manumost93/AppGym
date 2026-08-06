@@ -23,6 +23,13 @@ spring:
           uri: http://ai-service:8084
           predicates:
             - Path=/api/ai/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 2
+                redis-rate-limiter.burstCapacity: 5
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@userKeyResolver}"
       globalcors:
         cors-configurations:
           '[/**]':
@@ -42,6 +49,7 @@ security:
     - /api/auth/register
     - /api/auth/login
     - /api/auth/refresh
+    - /api/auth/logout
     - /actuator/**
 
 management:

@@ -26,7 +26,7 @@ Proyecto de portfolio construido con **Angular + microservicios Java/Spring Boot
 - **Frontend**: Angular 22 (standalone components + signals) + Tailwind CSS.
 - **Backend**: Java 21 + Spring Boot 3.4 (Maven multi-módulo), Spring Cloud Gateway, Spring Data JPA, JWT (HS256).
 - **IA**: SDK oficial de Java para la API de Claude (`com.anthropic:anthropic-java`) — chat, recomendaciones y salidas estructuradas.
-- **Datos**: PostgreSQL (una base de datos por servicio) + Redis (rate limiting, blacklist de tokens).
+- **Datos**: PostgreSQL (una base de datos por servicio) + Redis (rate limiting real de `/api/ai/**` y freno de fuerza bruta en el login).
 - **Infraestructura**: Docker Compose, GitHub Actions (test + build en cada push, publicación de imágenes en GHCR desde `main`), Traefik + Let's Encrypt en producción.
 
 ## Ejecutar en local
@@ -74,6 +74,14 @@ Cada socio, al iniciar sesión, llega a la página propia de su negocio — comp
 - **`/padel`**: selector visual de pistas que filtra el calendario al pincharlas.
 
 Las tres reutilizan un componente compartido de calendario (`ActivityCalendarComponent`) para la lógica de reservar/cancelar, y la ruta `/schedule` actúa como despachador: redirige a cada socio a la página que le corresponde según el tipo de negocio al que pertenece.
+
+## Gestión de cuenta y de negocio
+
+- Cualquier usuario puede **cambiar su contraseña** y **cerrar sesión de verdad** (revoca el token en el servidor, no solo en el navegador) desde el panel principal.
+- El `BUSINESS_ADMIN` puede **editar el perfil de su negocio** (nombre, descripción, contacto, color de marca) en cualquier momento desde "Mi negocio".
+- El `SUPER_ADMIN` puede **activar o desactivar** cualquier negocio de la plataforma desde "Gestionar negocios".
+- Las clases/pistas desactivadas se pueden **reactivar** desde "Actividades y horario" (casilla "Ver desactivadas").
+- El login está protegido contra fuerza bruta (5 intentos fallidos y hay que esperar), y `/api/ai/**` tiene límite de peticiones por usuario para proteger la cuota de la API de Claude.
 
 ## Documentación
 

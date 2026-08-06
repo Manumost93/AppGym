@@ -70,5 +70,54 @@
         </div>
       }
     </div>
+
+    <div class="mt-8 rounded-2xl bg-zinc-950/60 p-6 border border-white/10">
+      <button
+        type="button"
+        (click)="togglePasswordForm()"
+        class="flex w-full items-center justify-between text-left"
+      >
+        <h2 class="font-display text-lg font-bold text-white">Cambiar contraseña</h2>
+        <span class="text-slate-400">{{ showPasswordForm() ? '▲' : '▼' }}</span>
+      </button>
+
+      @if (showPasswordForm()) {
+        <form class="mt-4 space-y-4" [formGroup]="passwordForm" (ngSubmit)="submitPasswordChange()">
+          <div>
+            <label class="block text-sm font-medium text-slate-300" for="currentPassword">Contraseña actual</label>
+            <input
+              id="currentPassword"
+              type="password"
+              formControlName="currentPassword"
+              class="mt-1 w-full rounded-lg border border-white/10 bg-black px-3 py-2 text-white outline-none focus:border-emerald-500"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-300" for="newPassword">Nueva contraseña</label>
+            <input
+              id="newPassword"
+              type="password"
+              formControlName="newPassword"
+              class="mt-1 w-full rounded-lg border border-white/10 bg-black px-3 py-2 text-white outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          @if (passwordError()) {
+            <p class="text-sm text-red-400">{{ passwordError() }}</p>
+          }
+          @if (passwordSuccess()) {
+            <p class="text-sm text-emerald-400">Contraseña actualizada correctamente.</p>
+          }
+
+          <button
+            type="submit"
+            [disabled]="changingPassword()"
+            class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-black shadow-[0_0_25px_-5px_rgba(16,185,129,0.7)] transition hover:bg-emerald-400 disabled:opacity-50"
+          >
+            {{ changingPassword() ? 'Guardando…' : 'Guardar contraseña' }}
+          </button>
+        </form>
+      }
+    </div>
   </div>
 </div>

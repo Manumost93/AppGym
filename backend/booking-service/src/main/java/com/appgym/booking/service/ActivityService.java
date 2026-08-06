@@ -41,6 +41,13 @@ public class ActivityService {
                 .toList();
     }
 
+    /** Incluye actividades desactivadas, para que BUSINESS_ADMIN/STAFF puedan reactivarlas. */
+    public List<ActivityResponse> listAll(UUID businessId) {
+        return repository.findByBusinessIdOrderByNameAsc(businessId).stream()
+                .map(ActivityResponse::from)
+                .toList();
+    }
+
     @Transactional
     public ActivityResponse update(UUID businessId, UUID activityId, ActivityRequest request) {
         Activity activity = findOwned(businessId, activityId);
@@ -49,6 +56,9 @@ public class ActivityService {
         activity.setCapacity(request.capacity());
         activity.setDurationMinutes(request.durationMinutes());
         activity.setInstructorName(request.instructorName());
+        if (request.active() != null) {
+            activity.setActive(request.active());
+        }
         return ActivityResponse.from(activity);
     }
 

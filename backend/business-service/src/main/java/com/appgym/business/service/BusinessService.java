@@ -4,6 +4,7 @@ import com.appgym.business.domain.Business;
 import com.appgym.business.repository.BusinessRepository;
 import com.appgym.business.web.dto.BusinessResponse;
 import com.appgym.business.web.dto.CreateBusinessRequest;
+import com.appgym.business.web.dto.UpdateBusinessRequest;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -43,5 +44,29 @@ public class BusinessService {
         return repository.findById(id)
                 .map(BusinessResponse::from)
                 .orElseThrow(() -> new NoSuchElementException("Negocio no encontrado: " + id));
+    }
+
+    @Transactional
+    public BusinessResponse update(UUID businessId, UpdateBusinessRequest request) {
+        Business business = findOwned(businessId);
+        business.setName(request.name());
+        business.setDescription(request.description());
+        business.setContactEmail(request.contactEmail());
+        business.setContactPhone(request.contactPhone());
+        business.setAddress(request.address());
+        business.setPrimaryColor(request.primaryColor());
+        return BusinessResponse.from(business);
+    }
+
+    @Transactional
+    public BusinessResponse updateStatus(UUID businessId, boolean active) {
+        Business business = findOwned(businessId);
+        business.setActive(active);
+        return BusinessResponse.from(business);
+    }
+
+    private Business findOwned(UUID businessId) {
+        return repository.findById(businessId)
+                .orElseThrow(() -> new NoSuchElementException("Negocio no encontrado: " + businessId));
     }
 }

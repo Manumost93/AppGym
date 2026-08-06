@@ -9,12 +9,17 @@ export class BookingService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/booking`;
 
-  listActivities(): Observable<Activity[]> {
-    return this.http.get<Activity[]>(`${this.baseUrl}/activities`);
+  listActivities(includeInactive = false): Observable<Activity[]> {
+    const suffix = includeInactive ? '?includeInactive=true' : '';
+    return this.http.get<Activity[]>(`${this.baseUrl}/activities${suffix}`);
   }
 
   createActivity(request: ActivityRequest): Observable<Activity> {
     return this.http.post<Activity>(`${this.baseUrl}/activities`, request);
+  }
+
+  updateActivity(activityId: string, request: ActivityRequest): Observable<Activity> {
+    return this.http.put<Activity>(`${this.baseUrl}/activities/${activityId}`, request);
   }
 
   deactivateActivity(activityId: string): Observable<void> {

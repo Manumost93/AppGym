@@ -1,6 +1,7 @@
 package com.appgym.auth.web;
 
 import com.appgym.auth.service.AuthService;
+import com.appgym.auth.service.LoginAttemptService;
 import com.appgym.auth.service.RefreshTokenService;
 import com.appgym.common.dto.ApiError;
 import com.appgym.common.security.ForbiddenException;
@@ -38,6 +39,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiError> handleBadCredentials(BadCredentialsException ex, HttpServletRequest req) {
         return build(HttpStatus.UNAUTHORIZED, ex.getMessage(), req);
+    }
+
+    @ExceptionHandler(LoginAttemptService.TooManyAttemptsException.class)
+    public ResponseEntity<ApiError> handleTooManyAttempts(LoginAttemptService.TooManyAttemptsException ex, HttpServletRequest req) {
+        return build(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), req);
     }
 
     @ExceptionHandler(RefreshTokenService.InvalidRefreshTokenException.class)

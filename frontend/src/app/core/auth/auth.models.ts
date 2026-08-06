@@ -35,3 +35,8 @@ export interface RegisterRequest {
   role: Role;
   businessId?: string | null;
 }
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
