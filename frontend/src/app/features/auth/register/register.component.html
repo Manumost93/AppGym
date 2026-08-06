@@ -1,6 +1,9 @@
 <div class="bg-grid relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-4 py-10">
   <div class="pointer-events-none absolute -top-40 left-[-10%] h-96 w-96 rounded-full bg-emerald-500/15 blur-[120px]"></div>
   <div class="relative w-full max-w-sm rounded-2xl border border-white/10 bg-zinc-950/80 p-8 shadow-[0_0_60px_-20px_rgba(16,185,129,0.35)] backdrop-blur">
+    <a routerLink="/" class="mb-4 inline-flex items-center gap-1 text-sm text-slate-400 hover:text-white">
+      ← Inicio
+    </a>
     @if (pendingApproval()) {
       <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -90,7 +93,6 @@
               formControlName="businessId"
               class="mt-1 w-full rounded-lg border border-white/10 bg-black px-3 py-2 text-white outline-none focus:border-emerald-500"
             >
-              <option value="" disabled>Elige un negocio…</option>
               @for (business of disciplineBusinesses; track business.id) {
                 <option [value]="business.id">{{ business.name }}</option>
               }

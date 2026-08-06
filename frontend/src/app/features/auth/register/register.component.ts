@@ -62,6 +62,19 @@ export class RegisterComponent {
       this.form.patchValue({ role: presetRole, businessId: presetBusinessId });
       this.form.get('role')?.disable();
       this.form.get('businessId')?.disable();
+    } else {
+      // Si el visitante elige MEMBER a mano (sin venir de una tarjeta de
+      // disciplina), el desplegable de negocio siempre parte de un valor
+      // real seleccionado: si no se toca, el registro debe poder enviarse
+      // igual en vez de fallar en silencio con un businessId vacio.
+      this.form.get('role')!.valueChanges.subscribe((role) => {
+        if (this.lockedFields()) {
+          return;
+        }
+        this.form.patchValue({
+          businessId: role === 'MEMBER' ? this.disciplineBusinesses[0].id : '',
+        });
+      });
     }
   }
 
