@@ -76,20 +76,28 @@ public class DemoDataSeeder implements ApplicationRunner {
         Activity padel2 = save(new Activity(PADEL_ACTIVITY_ID_2, DemoSeedIds.BUSINESS_ID_PADEL, ActivityType.COURT,
                 "Pista de padel 2", "Pista exterior con iluminacion nocturna.", 4, 90, null));
 
-        ScheduleSlot wodSlot1 = saveSlot(wod, DemoSeedIds.BUSINESS_ID, nextDayAt(1, 9));
-        saveSlot(wod, DemoSeedIds.BUSINESS_ID, nextDayAt(2, 9));
-        saveSlot(wod, DemoSeedIds.BUSINESS_ID, nextDayAt(3, 18));
-        saveSlot(weightlifting, DemoSeedIds.BUSINESS_ID, nextDayAt(2, 19));
+        ScheduleSlot wodSlot1 = saveSlot(wod, DemoSeedIds.BUSINESS_ID, nextDayAt(1, 9),
+                "5 rondas por tiempo: 10 dominadas, 15 flexiones, 20 sentadillas con salto.");
+        saveSlot(wod, DemoSeedIds.BUSINESS_ID, nextDayAt(2, 9),
+                "Fuerza: 5x5 peso muerto + accesorio de core.");
+        saveSlot(wod, DemoSeedIds.BUSINESS_ID, nextDayAt(3, 18),
+                "AMRAP 20 min: 5 burpees, 10 kettlebell swings, 15 dobles saltos a la comba.");
+        saveSlot(weightlifting, DemoSeedIds.BUSINESS_ID, nextDayAt(2, 19),
+                "Tecnica de arrancada + dos tiempos, con progresiones a baja carga.");
 
-        saveSlot(spinning, DemoSeedIds.BUSINESS_ID_GYM, nextDayAt(1, 8));
-        saveSlot(spinning, DemoSeedIds.BUSINESS_ID_GYM, nextDayAt(3, 8));
-        saveSlot(yoga, DemoSeedIds.BUSINESS_ID_GYM, nextDayAt(1, 19));
-        saveSlot(yoga, DemoSeedIds.BUSINESS_ID_GYM, nextDayAt(4, 19));
+        saveSlot(spinning, DemoSeedIds.BUSINESS_ID_GYM, nextDayAt(1, 8),
+                "45 min de HIIT sobre bici, con series de sprint y recuperacion activa.");
+        saveSlot(spinning, DemoSeedIds.BUSINESS_ID_GYM, nextDayAt(3, 8),
+                "Resistencia en llano + 3 puertos simulados, ritmo constante.");
+        saveSlot(yoga, DemoSeedIds.BUSINESS_ID_GYM, nextDayAt(1, 19),
+                "Vinyasa flow nivel intermedio, cierre con respiracion guiada.");
+        saveSlot(yoga, DemoSeedIds.BUSINESS_ID_GYM, nextDayAt(4, 19),
+                "Yoga restaurativo, enfocado en movilidad de cadera y espalda.");
 
-        saveSlot(padel1, DemoSeedIds.BUSINESS_ID_PADEL, nextDayAt(1, 17));
-        saveSlot(padel1, DemoSeedIds.BUSINESS_ID_PADEL, nextDayAt(2, 19));
-        saveSlot(padel2, DemoSeedIds.BUSINESS_ID_PADEL, nextDayAt(1, 20));
-        saveSlot(padel2, DemoSeedIds.BUSINESS_ID_PADEL, nextDayAt(3, 20));
+        saveSlot(padel1, DemoSeedIds.BUSINESS_ID_PADEL, nextDayAt(1, 17), null);
+        saveSlot(padel1, DemoSeedIds.BUSINESS_ID_PADEL, nextDayAt(2, 19), null);
+        saveSlot(padel2, DemoSeedIds.BUSINESS_ID_PADEL, nextDayAt(1, 20), null);
+        saveSlot(padel2, DemoSeedIds.BUSINESS_ID_PADEL, nextDayAt(3, 20), null);
 
         Booking demoBooking = new Booking(wodSlot1.getId(), DemoSeedIds.BUSINESS_ID, DemoSeedIds.MEMBER_USER_ID,
                 BookingStatus.CONFIRMED);
@@ -102,9 +110,10 @@ public class DemoDataSeeder implements ApplicationRunner {
         return activityRepository.save(activity);
     }
 
-    private ScheduleSlot saveSlot(Activity activity, UUID businessId, Instant startTime) {
+    private ScheduleSlot saveSlot(Activity activity, UUID businessId, Instant startTime, String notes) {
         Instant endTime = startTime.plusSeconds(activity.getDurationMinutes() * 60L);
         ScheduleSlot slot = new ScheduleSlot(activity.getId(), businessId, startTime, endTime, activity.getCapacity());
+        slot.setNotes(notes);
         return slotRepository.save(slot);
     }
 

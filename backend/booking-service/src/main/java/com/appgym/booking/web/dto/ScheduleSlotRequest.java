@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public record ScheduleSlotRequest(
         @NotNull UUID activityId,
-        @NotNull Instant startTime
+        @NotNull Instant startTime,
+        String notes
 ) {
 }

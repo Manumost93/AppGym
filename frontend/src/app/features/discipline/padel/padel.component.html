@@ -1,0 +1,67 @@
+<div class="bg-grid min-h-screen bg-black">
+  <div class="relative isolate overflow-hidden">
+    <img [src]="heroImage" alt="" class="absolute inset-0 h-full w-full object-cover opacity-30" />
+    <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/85 to-black"></div>
+    <div class="relative mx-auto max-w-3xl px-4 py-10">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-widest text-emerald-400">
+            {{ business()?.name ?? 'Tu club de pádel' }}
+          </p>
+          <h1 class="font-display mt-1 text-3xl font-extrabold text-white">Reserva de pistas</h1>
+          <p class="mt-1 text-sm text-slate-300">Elige pista y franja horaria, confirmación al instante.</p>
+        </div>
+        <a routerLink="/dashboard" class="text-sm text-slate-400 hover:text-white">← Volver</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-3xl px-4 py-10">
+    @if (errorMessage()) {
+      <div class="mb-6 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{{ errorMessage() }}</div>
+    }
+
+    @if (courts().length > 0) {
+      <div class="mb-8">
+        <h2 class="font-display text-lg font-bold text-white">Pistas</h2>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          @for (court of courts(); track court.id) {
+            <button
+              type="button"
+              (click)="selectCourt(court.id)"
+              class="neon-card rounded-xl border p-5 text-left transition"
+              [class.border-emerald-400]="selectedCourtId() === court.id"
+              [class.bg-emerald-500/10]="selectedCourtId() === court.id"
+              [class.border-white/10]="selectedCourtId() !== court.id"
+              [class.bg-black]="selectedCourtId() !== court.id"
+            >
+              <div class="flex items-center justify-between">
+                <p class="font-display text-base font-bold text-white">{{ court.name }}</p>
+                <span class="rounded-full bg-white/5 px-2 py-0.5 text-xs text-slate-400">
+                  {{ court.durationMinutes }} min
+                </span>
+              </div>
+              @if (court.description) {
+                <p class="mt-2 text-sm text-slate-400">{{ court.description }}</p>
+              }
+              <p class="mt-3 text-xs font-semibold uppercase tracking-widest text-emerald-400">
+                {{ selectedCourtId() === court.id ? 'Mostrando solo esta pista ✕' : 'Ver horarios de esta pista →' }}
+              </p>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <app-activity-calendar
+      [slots]="visibleSlots()"
+      [myBookings]="myBookings()"
+      [bookingSlotId]="bookingSlotId()"
+      [loading]="loading()"
+      title="Horarios disponibles"
+      emptyMessage="No hay horarios disponibles para esta selección."
+      (book)="book($event)"
+      (cancel)="cancel($event)"
+    />
+  </div>
+</div>

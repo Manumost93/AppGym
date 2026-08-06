@@ -35,6 +35,7 @@ public class ScheduleSlotService {
 
         ScheduleSlot slot = new ScheduleSlot(activity.getId(), businessId, request.startTime(), endTime,
                 activity.getCapacity());
+        slot.setNotes(request.notes());
         slotRepository.save(slot);
 
         return toResponse(slot, activity);
@@ -69,7 +70,8 @@ public class ScheduleSlotService {
                 slot.getCapacity(),
                 confirmed,
                 waitlist,
-                confirmed >= slot.getCapacity()
+                confirmed >= slot.getCapacity(),
+                slot.getNotes()
         );
     }
 }

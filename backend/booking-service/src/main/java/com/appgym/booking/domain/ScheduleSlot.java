@@ -35,6 +35,10 @@ public class ScheduleSlot {
     @Column(nullable = false)
     private int capacity;
 
+    /** Detalle propio de esta franja: el WOD del dia, el enfoque de la clase, etc. */
+    @Column
+    private String notes;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -72,5 +76,13 @@ public class ScheduleSlot {
 
     public int getCapacity() {
         return capacity;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 }

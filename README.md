@@ -63,7 +63,17 @@ Hay 3 negocios demo, uno por disciplina, cada uno con sus propias actividades, h
 
 ### Alta de nuevos socios y aprobación
 
-Desde la landing, al pinchar en una de las 3 disciplinas se abre un registro con el negocio ya preseleccionado. La cuenta creada queda **pendiente de aprobación** y no puede iniciar sesión todavía. El administrador de ese negocio revisa las solicitudes en **Gestión de clientes** (`/clients`, enlazado desde su panel): puede aceptar, rechazar, marcar como pagado/no pagado o eliminar a cada socio. Una vez aceptado, el socio ya puede iniciar sesión con normalidad y accede directamente a la página de reservas de su negocio (no hay notificaciones en tiempo real: el efecto se ve la próxima vez que el socio inicia sesión).
+Desde la landing, al pinchar en una de las 3 disciplinas se abre un registro con el negocio ya preseleccionado. La cuenta creada queda **pendiente de aprobación** y no puede iniciar sesión todavía. El administrador de ese negocio revisa las solicitudes en **Gestión de clientes** (`/clients`, enlazado desde su panel): puede aceptar, rechazar, marcar como pagado/no pagado o eliminar a cada socio. Una vez aceptado, el socio ya puede iniciar sesión con normalidad y se le redirige automáticamente a la página de reservas de su negocio (no hay notificaciones en tiempo real: el efecto se ve la próxima vez que el socio inicia sesión).
+
+### Tres páginas de disciplina, cada una con su propio calendario
+
+Cada socio, al iniciar sesión, llega a la página propia de su negocio — completamente independiente de las otras dos, aunque las tres compartan la misma mecánica de reservas con control de aforo y lista de espera:
+
+- **`/gimnasio`**: clases dirigidas (spinning, yoga) + una sección de rutinas de sala libre sugeridas.
+- **`/box`**: destaca el **próximo WOD** en una tarjeta grande con su detalle (series, repeticiones…), y debajo el resto de clases/horarios.
+- **`/padel`**: selector visual de pistas que filtra el calendario al pincharlas.
+
+Las tres reutilizan un componente compartido de calendario (`ActivityCalendarComponent`) para la lógica de reservar/cancelar, y la ruta `/schedule` actúa como despachador: redirige a cada socio a la página que le corresponde según el tipo de negocio al que pertenece.
 
 ## Documentación
 

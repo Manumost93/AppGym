@@ -34,6 +34,7 @@ export class ActivitiesComponent implements OnInit {
 
   readonly slotForm = this.fb.group({
     startTime: ['', [Validators.required]],
+    notes: [''],
   });
 
   ngOnInit(): void {
@@ -100,7 +101,9 @@ export class ActivitiesComponent implements OnInit {
 
     const startTime = new Date(this.slotForm.value.startTime!).toISOString();
 
-    this.bookingService.createSlot({ activityId, startTime }).subscribe({
+    this.bookingService
+      .createSlot({ activityId, startTime, notes: this.slotForm.value.notes || undefined })
+      .subscribe({
       next: () => {
         this.creatingSlotFor.set(null);
         this.reloadSlots();

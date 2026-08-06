@@ -34,11 +34,13 @@ export interface ScheduleSlot {
   confirmedCount: number;
   waitlistCount: number;
   full: boolean;
+  notes: string | null;
 }
 
 export interface ScheduleSlotRequest {
   activityId: string;
   startTime: string;
+  notes?: string;
 }
 
 export interface Booking {

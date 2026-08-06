@@ -54,5 +54,21 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/booking/schedule/schedule.component').then((m) => m.ScheduleComponent),
   },
+  {
+    path: 'gimnasio',
+    canActivate: [authGuard, roleGuard(['MEMBER'])],
+    loadComponent: () => import('./features/discipline/gym/gym.component').then((m) => m.GymComponent),
+  },
+  {
+    path: 'box',
+    canActivate: [authGuard, roleGuard(['MEMBER'])],
+    loadComponent: () =>
+      import('./features/discipline/crossfit/crossfit.component').then((m) => m.CrossfitComponent),
+  },
+  {
+    path: 'padel',
+    canActivate: [authGuard, roleGuard(['MEMBER'])],
+    loadComponent: () => import('./features/discipline/padel/padel.component').then((m) => m.PadelComponent),
+  },
   { path: '**', redirectTo: 'login' },
 ];

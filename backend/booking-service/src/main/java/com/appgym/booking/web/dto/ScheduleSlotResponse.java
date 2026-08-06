@@ -15,6 +15,7 @@ public record ScheduleSlotResponse(
         int capacity,
         long confirmedCount,
         long waitlistCount,
-        boolean full
+        boolean full,
+        String notes
 ) {
 }
